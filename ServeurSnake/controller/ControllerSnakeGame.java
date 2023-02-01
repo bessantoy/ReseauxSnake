@@ -1,15 +1,11 @@
 package controller;
 
-import java.util.ArrayList;
 
-import agent.Snake;
-import item.Item;
 import model.SnakeGame;
 import model.InputMap;
 import utils.AgentAction;
-import view.PanelSnakeGame;
-import view.ViewSnakeGame;
-import view.ViewCommand;
+
+import java.io.*;
 
 
 
@@ -19,7 +15,7 @@ public class ControllerSnakeGame extends AbstractController {
 	SnakeGame snakeGame;
 	
 	
-	public ControllerSnakeGame() {
+	public ControllerSnakeGame(DataOutputStream sortie) {
 		
 
 		String layoutName = "layouts/smallArena.lay";
@@ -36,19 +32,12 @@ public class ControllerSnakeGame extends AbstractController {
 		
 
 		
-		this.snakeGame = new SnakeGame(10000, inputMap);
+		this.snakeGame = new SnakeGame(10000, inputMap, sortie);
 		this.snakeGame.init();
 		
 		this.game = snakeGame;
-		
 
-		
-		PanelSnakeGame panelSnakeGame = new PanelSnakeGame(inputMap.getSizeX(), inputMap.getSizeY(), inputMap.get_walls(), inputMap.getStart_snakes(), inputMap.getStart_items());
-		
-		
-		ViewSnakeGame viewSnakeGame = new ViewSnakeGame(this, snakeGame, panelSnakeGame);
-		
-		ViewCommand viewCommand = new ViewCommand(this, snakeGame);
+		this.game.run();
 		
 		
 	}

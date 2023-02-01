@@ -1,7 +1,6 @@
 package controller;
 
 import model.Game;
-import view.ViewCommand;
 
 public abstract class AbstractController {
 

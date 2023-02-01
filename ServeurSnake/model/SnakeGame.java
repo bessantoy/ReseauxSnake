@@ -13,6 +13,7 @@ import utils.FeaturesItem;
 import utils.FeaturesSnake;
 import utils.ItemType;
 import utils.Position;
+import java.io.*;
 
 
 
@@ -46,16 +47,16 @@ public class SnakeGame extends Game{
 	private int sizeX;
 	private int sizeY;
 
+	DataOutputStream sortie;
 
 
-
-	public SnakeGame(int maxTurn, InputMap inputMap) {
+	public SnakeGame(int maxTurn, InputMap inputMap, DataOutputStream sortie) {
 
 		super(maxTurn);
 
 		this.inputMap = inputMap;
 		this.inputMoveHuman1 = AgentAction.MOVE_DOWN;
-
+		this.sortie = sortie;
 
 	}
 
@@ -132,7 +133,12 @@ public class SnakeGame extends Game{
 
 			if(r < probSpecialItem) {
 				
-				System.out.println("add random item");
+				try {
+					sortie.writeUTF("add random item");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				addRandomItem();
 			}
 
@@ -183,7 +189,12 @@ public class SnakeGame extends Game{
 
 	@Override
 	public void gameOver() {
-		System.out.println("Game over");
+		try {
+			sortie.writeUTF("Game over");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -352,7 +363,12 @@ public class SnakeGame extends Game{
 
 	public void checkSnakeEaten() {
 
-		System.out.println("checkSnakeEaten");
+		try {
+			sortie.writeUTF("checkSnakeEaten");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		for(Snake snake1 : snakes) {
 

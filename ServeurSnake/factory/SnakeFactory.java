@@ -1,14 +1,11 @@
 package factory;
 
-import java.util.ArrayList;
 
 import agent.Snake;
 import strategy.StrategyHuman;
 import strategy.StrategyRandom;
 import strategy.StrategyAdvanced;
 import strategy.StrategyDown;
-import utils.AgentAction;
-import utils.ColorSnake;
 import utils.FeaturesSnake;
 import utils.Position;
 

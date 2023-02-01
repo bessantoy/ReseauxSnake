@@ -9,8 +9,7 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 
-import agent.Snake;
-import item.Item;
+
 import utils.AgentAction;
 import utils.ColorSnake;
 import utils.FeaturesItem;

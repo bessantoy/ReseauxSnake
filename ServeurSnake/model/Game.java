@@ -1,4 +1,5 @@
 package model;
+import java.io.IOException;
 import java.util.Observable;
 
 
@@ -38,7 +39,12 @@ public abstract class Game extends Observable implements Runnable{
 		
 		if(this.gameContinue() & turn < maxTurn) {
 			turn ++;
-			takeTurn();
+			try {
+				takeTurn();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			isRunning = false;
 			
@@ -82,7 +88,7 @@ public abstract class Game extends Observable implements Runnable{
 		
 	public abstract void initializeGame();
 	
-	public abstract void takeTurn();
+	public abstract void takeTurn() throws IOException;
 	
 	public abstract boolean gameContinue();
 	

@@ -1,4 +1,7 @@
 import java.net.*;
+
+import controller.ControllerSnakeGame;
+
 import java.io.*;
 public class servTexte1 {
 public static void main(String[] argu) {
@@ -18,8 +21,10 @@ try {
         entree = new BufferedReader(new InputStreamReader(so.getInputStream()));
         sortie = new DataOutputStream (so.getOutputStream());
         ch = entree.readLine(); // on lit ce qui arrive
-        System.out.println("on a reçu : |"+ch+"|");
-        sortie.writeInt(ch.length()); // on renvoie la longueur de la chaîne
+        System.out.println(ch);
+        if(ch=="run"){
+            ControllerSnakeGame controller = new ControllerSnakeGame(sortie);
+        }
         so.close();
         System.out.println("on a envoyé : "+ch.length()+" et on a fermé la connexion");
     }
