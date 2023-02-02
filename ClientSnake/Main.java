@@ -6,7 +6,7 @@ import java.util.Scanner;
 import model.Network;
 import view.ViewCommand; 
 
-public class cliTexte1 {
+public class Main {
     private Socket clientSocket;
     private PrintWriter sortie;
     private BufferedReader entree;
@@ -49,7 +49,7 @@ public class cliTexte1 {
     }
 
     public static void main(String[] args) {
-        cliTexte1 client = new cliTexte1();
+        Main client = new Main();
         client.startConnection("localhost", 5556);
         //client.newGame();
         try{

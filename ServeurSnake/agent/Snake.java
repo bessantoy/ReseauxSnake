@@ -2,7 +2,6 @@ package agent;
 
 import java.util.ArrayList;
 
-import model.Network;
 import strategy.Strategy;
 import utils.AgentAction;
 import utils.ColorSnake;

@@ -4,7 +4,7 @@ import controller.ControllerSnakeGame;
 
 import java.io.*;
 
-public class servTexte1 {
+public class Main {
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private PrintWriter sortie;
@@ -66,7 +66,7 @@ public class servTexte1 {
     }
 
     public static void main(String[] args) {
-        servTexte1 server = new servTexte1();
+        Main server = new Main();
         server.start(5556);
     }
 }
