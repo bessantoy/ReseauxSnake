@@ -8,8 +8,4 @@ public enum ColorSnake {
 	private ColorSnake(String color) {
 		this.color = color;
 	}
-
-	public String toJson() {
-		return "{\"color\":\"" + color + "\"}";
-	}
 }

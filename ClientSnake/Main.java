@@ -6,6 +6,7 @@ import java.util.Scanner;
 import model.Network;
 import view.PanelSnakeGame;
 import view.ViewCommand;
+import view.ViewSnakeGame;
 
 public class Main {
     private Socket clientSocket;
@@ -13,6 +14,7 @@ public class Main {
     private BufferedReader entree;
     private Network network;
     private ViewCommand viewCommand;
+    private ViewSnakeGame viewSnakeGame;
 
     public void printServerMessage(String msg) {
         System.out.println("Server : " + msg + "\n");
@@ -32,7 +34,6 @@ public class Main {
 
     public void newGame() {
         this.network = new Network();
-        this.viewCommand = new ViewCommand(network);
     }
 
     public void stopConnection() {
@@ -59,13 +60,18 @@ public class Main {
                 if (response.equals("new game initialized")) {
                     client.newGame();
                 }
-                if (response.startsWith("#JSON#GF")) {
-                    String JSON = response.substring(8);
+                if (response.startsWith("#JSON#")) {
+                    client.newGame();
+                    String JSON = response.substring(6);
+                    System.out.print(JSON);
                     client.network.readGameFeatures(JSON);
-                    new PanelSnakeGame(client.network.getGameFeatures().getSizeX(),
+                    client.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
+                            client.network.getGameFeatures().getSizeX(),
                             client.network.getGameFeatures().getSizeY(), client.network.getGameFeatures().getWalls(),
                             client.network.getGameFeatures().getFeaturesSnakes(),
-                            client.network.getGameFeatures().getFeaturesItems());
+                            client.network.getGameFeatures().getFeaturesItems()));
+                    client.viewCommand = new ViewCommand(client.network);
+
                 }
                 client.printServerMessage(response);
                 Scanner sc = new Scanner(System.in);

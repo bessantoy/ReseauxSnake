@@ -8,8 +8,4 @@ public enum AgentAction {
 	private AgentAction(String action) {
 		this.action = action;
 	}
-
-	public String toJson() {
-		return "{\"action\":\"" + action + "\"}";
-	}
 }

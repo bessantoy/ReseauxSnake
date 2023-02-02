@@ -24,57 +24,6 @@ public class GameFeatures {
     this.speed = speed;
   }
 
-  public GameFeatures(String Json) {
-    String[] jsonSplit = Json.split(",");
-    for (int i = 0; i < jsonSplit.length; i++) {
-      if (jsonSplit[i].contains("walls")) {
-        String[] jsonSplit2 = jsonSplit[i].split(":");
-        String[] jsonSplit3 = jsonSplit2[1].split("}");
-        String[] jsonSplit4 = jsonSplit3[0].split("\\[");
-        String[] jsonSplit5 = jsonSplit4[1].split("\\}");
-        for (int j = 0; j < jsonSplit5.length; j++) {
-          String[] jsonSplit6 = jsonSplit5[j].split(",");
-          int x = Integer.parseInt(jsonSplit6[0].split(":")[1]);
-          int y = Integer.parseInt(jsonSplit6[1].split(":")[1]);
-          walls[x][y] = true;
-        }
-      } else if (jsonSplit[i].contains("sizeX")) {
-        String[] jsonSplit2 = jsonSplit[i].split(":");
-        sizeX = Integer.parseInt(jsonSplit2[1]);
-      } else if (jsonSplit[i].contains("sizeY")) {
-        String[] jsonSplit2 = jsonSplit[i].split(":");
-        sizeY = Integer.parseInt(jsonSplit2[1]);
-      } else if (jsonSplit[i].contains("featuresSnakes")) {
-        String[] jsonSplit2 = jsonSplit[i].split(":");
-        String[] jsonSplit3 = jsonSplit2[1].split("}");
-        String[] jsonSplit4 = jsonSplit3[0].split("\\[");
-        String[] jsonSplit5 = jsonSplit4[1].split("\\}");
-        for (int j = 0; j < jsonSplit5.length; j++) {
-          featuresSnakes.add(new FeaturesSnake(jsonSplit5[j]));
-        }
-      } else if (jsonSplit[i].contains("featuresItems")) {
-        String[] jsonSplit2 = jsonSplit[i].split(":");
-        String[] jsonSplit3 = jsonSplit2[1].split("}");
-        String[] jsonSplit4 = jsonSplit3[0].split("\\[");
-        String[] jsonSplit5 = jsonSplit4[1].split("\\}");
-        for (int j = 0; j < jsonSplit5.length; j++) {
-          featuresItems.add(new FeaturesItem(jsonSplit5[j]));
-        }
-      } else if (jsonSplit[i].contains("state")) {
-        String[] jsonSplit2 = jsonSplit[i].split(":");
-        state = GameState.valueOf(jsonSplit2[1]);
-      } else if (jsonSplit[i].contains("turn")) {
-        String[] jsonSplit2 = jsonSplit[i].split(":");
-        turn = Integer.parseInt(jsonSplit2[1]);
-      } else if (jsonSplit[i].contains("speed")) {
-        String[] jsonSplit2 = jsonSplit[i].split(":");
-        speed = Long.parseLong(jsonSplit2[1]);
-      } else {
-        System.out.println("Error");
-      }
-    }
-  }
-
   public boolean[][] getWalls() {
     return walls;
   }
@@ -137,13 +86,6 @@ public class GameFeatures {
 
   public void setSpeed(long speed) {
     this.speed = speed;
-  }
-
-  public String toJson() {
-    return "{\"walls\":" + walls + ",\"sizeX\":" + sizeX + ",\"sizeY\":" + sizeY + ",\"featuresSnakes\":"
-        + featuresSnakes
-        + ",\"featuresItems\":" + featuresItems + ",\"state\":" + state + ",\"turn\":" + turn + ",\"speed\":" + speed
-        + "}";
   }
 
 }

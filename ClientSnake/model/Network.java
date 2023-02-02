@@ -1,5 +1,7 @@
 package model;
 
+import com.google.gson.Gson;
+
 import utils.AgentAction;
 import utils.GameFeatures;
 
@@ -31,7 +33,11 @@ public class Network {
   }
 
   public void readGameFeatures(String json) {
-    this.gameFeatures = new GameFeatures(json);
+    Gson gson = new Gson();
+    this.gameFeatures = gson.fromJson(json, GameFeatures.class);
+    if (this.gameFeatures == null) {
+      System.out.println("Error: gameFeatures is null");
+    }
   }
 
   public void sendClientSignal(String signal) {

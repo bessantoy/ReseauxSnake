@@ -2,6 +2,8 @@ import java.net.*;
 
 import controller.ControllerSnakeGame;
 
+import com.google.gson.*;
+
 import java.io.*;
 
 public class Main {
@@ -35,9 +37,11 @@ public class Main {
                 } else if (inputLine.equals("hello")) {
                     sortie.println("hello client");
                 } else if (inputLine.equals("new game")) {
-                    sortie.println("new game initialized");
                     this.controller = new ControllerSnakeGame();
-                    sendJSON(this.controller.gameFeaturesToJson());
+                    Gson gson = new Gson();
+                    String json = gson.toJson(this.controller.getGameFeatures());
+                    System.out.println("GF sent");
+                    sendJSON(json);
                 } else if (inputLine.equals("pause")) {
                     sortie.println("game paused");
                     this.controller.pause();
@@ -48,13 +52,10 @@ public class Main {
                     sortie.println("step");
                     this.controller.step();
                 }
-
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void stop() {

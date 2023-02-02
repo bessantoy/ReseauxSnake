@@ -8,8 +8,4 @@ public enum GameState {
   private GameState(String state) {
     this.state = state;
   }
-
-  public String toJson() {
-    return "{\"state\":\"" + state + "\"}";
-  }
 }

@@ -14,20 +14,6 @@ public class FeaturesItem {
 
 	}
 
-	public FeaturesItem(String json) {
-		String[] parts = json.split(",");
-		for (String part : parts) {
-			String[] keyValue = part.split(":");
-			if (keyValue[0].equals("\"x\"")) {
-				x = Integer.parseInt(keyValue[1]);
-			} else if (keyValue[0].equals("\"y\"")) {
-				y = Integer.parseInt(keyValue[1]);
-			} else if (keyValue[0].equals("\"type\"")) {
-				itemType = ItemType.valueOf(keyValue[1].replace("\"", ""));
-			}
-		}
-	}
-
 	public int getX() {
 		return x;
 	}
@@ -50,10 +36,6 @@ public class FeaturesItem {
 
 	public void setItemType(ItemType itemType) {
 		this.itemType = itemType;
-	}
-
-	public String toJson() {
-		return "{\"x\":" + x + ",\"y\":" + y + ",\"type\":\"" + itemType + "\"}";
 	}
 
 }

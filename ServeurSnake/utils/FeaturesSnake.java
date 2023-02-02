@@ -136,16 +136,4 @@ public class FeaturesSnake {
 		this.lastAction = lastAction;
 	}
 
-	public String toJson() {
-		String json = "{\"positions\":[";
-		for (Position position : positions) {
-			json += position.toJson() + ",";
-		}
-		json = json.substring(0, json.length() - 1);
-		json += "],\"colorSnake\":" + colorSnake.toJson() + ",\"lastAction\":" + lastAction.toJson() + ",\"isInvincible\":"
-				+ isInvincible + ",\"isSick\":" + isSick + "}";
-
-		return json;
-	}
-
 }

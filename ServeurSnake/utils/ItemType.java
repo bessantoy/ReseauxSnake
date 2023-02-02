@@ -9,7 +9,4 @@ public enum ItemType {
 		this.type = type;
 	}
 
-	public String toJson() {
-		return "{\"type\":\"" + type + "\"}";
-	}
 }

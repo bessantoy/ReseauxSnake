@@ -5,15 +5,13 @@ import model.InputMap;
 import utils.AgentAction;
 import utils.GameFeatures;
 
-import java.io.*;
-
 public class ControllerSnakeGame extends AbstractController {
 
 	SnakeGame snakeGame;
 
 	public ControllerSnakeGame() {
 
-		String layoutName = "ServeurSnake/layouts/smallArena.lay";
+		String layoutName = "layouts/smallArena.lay";
 
 		InputMap inputMap = null;
 
@@ -47,9 +45,8 @@ public class ControllerSnakeGame extends AbstractController {
 		this.snakeGame.setInputMoveHuman1(AgentAction.MOVE_RIGHT);
 	}
 
-	public String gameFeaturesToJson() {
-		GameFeatures gameFeatures = this.snakeGame.toGameFeatures();
-		return gameFeatures.toJson();
+	public GameFeatures getGameFeatures() {
+		return this.snakeGame.toGameFeatures();
 	}
 
 }

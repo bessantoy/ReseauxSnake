@@ -28,7 +28,4 @@ public class Position {
 		this.y = y;
 	}
 
-	public String toJson() {
-		return "{\"x\":" + x + ",\"y\":" + y + "}";
-	}
 }

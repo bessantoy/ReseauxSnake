@@ -1,5 +1,7 @@
 #!/bin/bash
 
+path=$(pwd)
+
 if [ -z "$1" ]; then
     echo "Usage: $0 <command>"
     exit 1
@@ -8,11 +10,7 @@ else
     cd "$1"
     file=$(find . -maxdepth 1 -iname "main.java" -type f)
     if [ -f "$file" ]; then
-      javac -d ./build/ $file
-      filename="${file##*/}"
-      filename="${filename%.*}"
-      cd build/
-      java $filename
+      java --enable-preview --source 19 -cp "$path/build/:$path/lib/gson.jar" $file
       cd ../
     else
       echo "$1/Main.java does not exist"
