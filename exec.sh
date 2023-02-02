@@ -16,7 +16,7 @@ else
       java $filename
       cd ../
     else
-      echo "Main.java does not exist"
+      echo "$1/Main.java does not exist"
     fi
     cd ../
   else
