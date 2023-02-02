@@ -27,9 +27,8 @@ public class ViewCommand implements Observer {
 	JButton playChoice;
 	JButton stepChoice;
 
-	public ViewCommand(Network network, Observable obs) {
+	public ViewCommand(Network network) {
 
-		obs.addObserver(this);
 
 		this.network = network;
 

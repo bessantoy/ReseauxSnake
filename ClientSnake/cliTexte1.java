@@ -1,11 +1,21 @@
 
 import java.net.*;
 import java.io.*;
+import java.util.Scanner;
+
+import model.Network;
+import view.ViewCommand; 
 
 public class cliTexte1 {
     private Socket clientSocket;
     private PrintWriter sortie;
     private BufferedReader entree;
+    private Network network;
+    private ViewCommand viewCommand;
+
+    public void printServerMessage(String msg){
+        System.out.println("Server : "  + msg + "\n");
+    }
 
     public void startConnection(String ip, int port) {
         try {
@@ -19,20 +29,11 @@ public class cliTexte1 {
 
     }
 
-    public void newGame() {
-        try {
-            String response;
-            sortie.println("new game");
-            while ((response = entree.readLine()) != null) {
-                if (response.equals("Game Over")) {
-                    break;
-                }
-                System.out.println(response);
-            }
+    
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void newGame() {
+        this.network = new Network();
+        this.viewCommand = new ViewCommand(network);
     }
 
     public void stopConnection() {
@@ -50,7 +51,23 @@ public class cliTexte1 {
     public static void main(String[] args) {
         cliTexte1 client = new cliTexte1();
         client.startConnection("localhost", 5556);
-        client.newGame();
+        //client.newGame();
+        try{
+
+            client.sortie.println("hello");
+            String response;
+            while((response = client.entree.readLine()) != "good bye"){
+                if(response.equals("new game initialized")){
+                    client.newGame();
+                }
+                client.printServerMessage(response);
+                Scanner sc = new Scanner(System.in);
+                System.out.println("commande :");
+                String str = sc.nextLine();
+                client.sortie.println(str);
+            }
+        }catch(IOException e){e.printStackTrace();}
+        
 
     }
 }

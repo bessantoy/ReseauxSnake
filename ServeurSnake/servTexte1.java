@@ -11,11 +11,16 @@ public class servTexte1 {
     private BufferedReader entree;
     private ControllerSnakeGame controller;
 
+    public void printClientMessage(String msg){
+        System.out.println("Server : " + msg + "\n");
+    }
+
     public void start(int port) {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Starting server");
             clientSocket = serverSocket.accept();
+            System.out.println("new client connected");
             sortie = new PrintWriter(clientSocket.getOutputStream(), true);
             entree = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             String inputLine;
@@ -23,11 +28,20 @@ public class servTexte1 {
             while ((inputLine = entree.readLine()) != null) {
                 if (inputLine.equals("exit")) {
                     sortie.println("good bye");
-                    break;
-                } else if (inputLine.equals("new game")) {
-                    this.controller = new ControllerSnakeGame(sortie);
+                } else if (inputLine.equals("hello")){
+                    sortie.println("hello client");
+                }else if (inputLine.equals("new game")) {
+                    sortie.println("new game initialized");
+                    this.controller = new ControllerSnakeGame();
                 } else if (inputLine.equals("pause")) {
+                    sortie.println("game paused");
                     this.controller.pause();
+                } else if (inputLine.equals("run")){
+                    sortie.println("game running");
+                    this.controller.play();
+                }else if(inputLine.equals("step")){
+                    sortie.println("step");
+                    this.controller.step();
                 }
 
             }

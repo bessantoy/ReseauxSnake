@@ -40,17 +40,15 @@ public class SnakeGame extends Game {
 	private int sizeX;
 	private int sizeY;
 
-	PrintWriter sortie;
 
 	GameState state;
 
-	public SnakeGame(int maxTurn, InputMap inputMap, PrintWriter sortie) {
+	public SnakeGame(int maxTurn, InputMap inputMap) {
 
 		super(maxTurn);
 
 		this.inputMap = inputMap;
 		this.inputMoveHuman1 = AgentAction.MOVE_DOWN;
-		this.sortie = sortie;
 
 	}
 
@@ -109,7 +107,7 @@ public class SnakeGame extends Game {
 			double r = rand.nextDouble();
 
 			if (r < probSpecialItem) {
-				sortie.println("add random item");
+				System.out.println("add random item");
 				addRandomItem();
 			}
 		}
@@ -143,7 +141,7 @@ public class SnakeGame extends Game {
 	@Override
 	public void gameOver() {
 
-		sortie.println("Game over");
+		System.out.println("Game over");
 	}
 
 	public void addRandomApple() {
@@ -267,7 +265,7 @@ public class SnakeGame extends Game {
 
 	public void checkSnakeEaten() {
 
-		sortie.println("checkSnakeEaten");
+		System.out.println("checkSnakeEaten");
 
 		for (Snake snake1 : snakes) {
 			if (snake1.getInvincibleTimer() < 1) {

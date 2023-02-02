@@ -10,7 +10,7 @@ public class ControllerSnakeGame extends AbstractController {
 
 	SnakeGame snakeGame;
 
-	public ControllerSnakeGame(PrintWriter sortie) {
+	public ControllerSnakeGame() {
 
 		String layoutName = "ServeurSnake/layouts/smallArena.lay";
 
@@ -23,12 +23,10 @@ public class ControllerSnakeGame extends AbstractController {
 			e.printStackTrace();
 		}
 
-		this.snakeGame = new SnakeGame(10000, inputMap, sortie);
+		this.snakeGame = new SnakeGame(10000, inputMap);
 		this.snakeGame.init();
 
 		this.game = snakeGame;
-
-		this.game.run();
 
 	}
 
