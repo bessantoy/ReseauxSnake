@@ -13,7 +13,8 @@ public class GameFeatures extends Observable {
   private int turn;
   private long speed;
 
-  public GameFeatures(boolean[][] walls, int sizeX, int sizeY, ArrayList<FeaturesSnake> featuresSnakes, ArrayList<FeaturesItem> featuresItems, GameState state, int turn, long speed) {
+  public GameFeatures(boolean[][] walls, int sizeX, int sizeY, ArrayList<FeaturesSnake> featuresSnakes,
+      ArrayList<FeaturesItem> featuresItems, GameState state, int turn, long speed) {
     this.walls = walls;
     this.sizeX = sizeX;
     this.sizeY = sizeY;
@@ -43,7 +44,7 @@ public class GameFeatures extends Observable {
   public ArrayList<FeaturesItem> getFeaturesItems() {
     return featuresItems;
   }
-  
+
   public GameState getState() {
     return state;
   }
@@ -87,5 +88,5 @@ public class GameFeatures extends Observable {
   public void setSpeed(long speed) {
     this.speed = speed;
   }
-  
+
 }

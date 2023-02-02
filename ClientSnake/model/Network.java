@@ -30,12 +30,12 @@ public class Network {
     this.gameFeatures = gameFeatures;
   }
 
-  public GameFeatures readGameFeatures(){
-    //TODO
+  public GameFeatures readGameFeatures() {
+    // TODO
     return null;
   }
 
-  public void sendClientSignal(String signal){
-    //TODO
+  public void sendClientSignal(String signal) {
+    // TODO
   }
 }

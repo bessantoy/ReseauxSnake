@@ -1,4 +1,5 @@
 package view;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -25,40 +26,38 @@ public class ViewCommand implements Observer {
 	JButton pauseChoice;
 	JButton playChoice;
 	JButton stepChoice;
-	
-	public ViewCommand (Network network, Observable obs)  {
 
+	public ViewCommand(Network network, Observable obs) {
 
 		obs.addObserver(this);
 
 		this.network = network;
-		
-		jFrame= new JFrame();
+
+		jFrame = new JFrame();
 		jFrame.setTitle("Bouton");
 		jFrame.setSize(new Dimension(700, 300));
-		Dimension windowSize=jFrame.getSize();
-		GraphicsEnvironment ge=GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Point centerPoint=ge.getCenterPoint();
+		Dimension windowSize = jFrame.getSize();
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		Point centerPoint = ge.getCenterPoint();
 
-		int dx= centerPoint.x - windowSize.width/ 2 + 1000;
-		int dy= centerPoint.y - windowSize.height/ 2 - 350;
-		jFrame.setLocation(dx,dy);
+		int dx = centerPoint.x - windowSize.width / 2 + 1000;
+		int dy = centerPoint.y - windowSize.height / 2 - 350;
+		jFrame.setLocation(dx, dy);
 
-		Icon icon_restart= new ImageIcon("icons/icon_restart.png");
+		Icon icon_restart = new ImageIcon("icons/icon_restart.png");
 		initChoice = new JButton(icon_restart);
 
-		Icon icon_play= new ImageIcon("icons/icon_play.png");
+		Icon icon_play = new ImageIcon("icons/icon_play.png");
 		playChoice = new JButton(icon_play);
 
-		Icon icon_step= new ImageIcon("icons/icon_step.png");
+		Icon icon_step = new ImageIcon("icons/icon_step.png");
 		stepChoice = new JButton(icon_step);
 
-		Icon icon_pause= new ImageIcon("icons/icon_pause.png");
+		Icon icon_pause = new ImageIcon("icons/icon_pause.png");
 		pauseChoice = new JButton(icon_pause);
 
-		
 		initChoice.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evenement){
+			public void actionPerformed(ActionEvent evenement) {
 				network.sendClientSignal("RESTART");
 				state.clickRestart();
 			}
@@ -66,52 +65,48 @@ public class ViewCommand implements Observer {
 
 		//
 		pauseChoice.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evenement){
+			public void actionPerformed(ActionEvent evenement) {
 				network.sendClientSignal("PAUSE");
 				state.clickPause();
 			}
 		});
 
-
 		playChoice.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evenement){
+			public void actionPerformed(ActionEvent evenement) {
 				network.sendClientSignal("RESUME");
 				state.clickPlay();
 			}
 		});
 
-
 		stepChoice.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evenement){
+			public void actionPerformed(ActionEvent evenement) {
 				network.sendClientSignal("STEP");
 				state.clickStep();
 			}
 		});
 
+		JSlider j = new JSlider(1, 10);
 
-		JSlider j = new JSlider(1,10);
-
-		j.setValue((int)network.getGameFeatures().getSpeed());
+		j.setValue((int) network.getGameFeatures().getSpeed());
 		j.setMajorTickSpacing(1);
 		j.setPaintTicks(true);
 		j.setPaintLabels(true);
 
 		j.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evenement) {
-				JSlider source = (JSlider)evenement.getSource();
-				if(!source.getValueIsAdjusting()) {
+				JSlider source = (JSlider) evenement.getSource();
+				if (!source.getValueIsAdjusting()) {
 					double speed = source.getValue();
-					network.getGameFeatures().setSpeed((long)speed);
+					network.getGameFeatures().setSpeed((long) speed);
 					System.out.println("Vitesse changée à : " + speed);
 				}
 			}
 		});
 
-
-		jFrame.setLayout(new GridLayout(2,1));
+		jFrame.setLayout(new GridLayout(2, 1));
 
 		JPanel haut = new JPanel();
-		haut.setLayout(new GridLayout(1,4));
+		haut.setLayout(new GridLayout(1, 4));
 		haut.add(initChoice);
 		haut.add(pauseChoice);
 		haut.add(playChoice);
@@ -120,36 +115,32 @@ public class ViewCommand implements Observer {
 		jFrame.add(haut);
 
 		JPanel bas = new JPanel();
-		bas.setLayout(new GridLayout(1,2));
+		bas.setLayout(new GridLayout(1, 2));
 
 		bas.add(j);
 
-		jtext = new JLabel("Tour : ",JLabel.CENTER);
+		jtext = new JLabel("Tour : ", JLabel.CENTER);
 
 		bas.add(jtext);
 		jFrame.add(bas);
 
 		jFrame.setVisible(true);
-		
-		
+
 		state = new StateStarting(this);
 
 	}
-
 
 	public void setState(StateViewCommand state) {
 		this.state = state;
 	}
 
-
 	@Override
 	public void update(Observable o, Object arg) {
 
-		GameFeatures game = (GameFeatures)o;
+		GameFeatures game = (GameFeatures) o;
 
-		jtext.setText("Tour :"+ game.getTurn());
+		jtext.setText("Tour :" + game.getTurn());
 
 	}
-
 
 }
