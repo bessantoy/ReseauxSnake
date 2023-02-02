@@ -17,28 +17,17 @@ public class cliTexte1 {
         
     }
 
-    public String sendMessage(String msg) {
-        try{
-            sortie.println(msg);
-            String resp = entree.readLine();
-            System.out.print("Send '" + msg + "' to the Server \n");
-            return "Server answered : '" + resp + "'\n\n";
-        }catch(IOException e){e.printStackTrace();}
-
-        return "sending message failed";
-        
-    }
-
-    public void play() {
+    public void newGame() {
         try{
             String response;
-            sortie.println("play");
+            sortie.println("new game");
             while ((response = entree.readLine()) != null){
                 if(response.equals("Game Over")){
                     break;
                 }
                 System.out.println(response);
             }
+
         }catch(IOException e){e.printStackTrace();}
     }
 
@@ -54,7 +43,7 @@ public class cliTexte1 {
     public static void main(String[] args) {
         cliTexte1 client = new cliTexte1();
         client.startConnection("localhost",5556);
-        client.play();
+        client.newGame();
         
     }
 }

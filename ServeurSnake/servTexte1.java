@@ -8,6 +8,7 @@ public class servTexte1 {
     private Socket clientSocket;
     private PrintWriter sortie;
     private BufferedReader entree;
+    private ControllerSnakeGame controller;
 
     public void start(int port) {
         try{
@@ -23,11 +24,14 @@ public class servTexte1 {
                     sortie.println("good bye");
                     break;
                 }
-                else if(inputLine.equals("play")){
-                    ControllerSnakeGame controller = new ControllerSnakeGame(sortie);
-                    break;
+                else if(inputLine.equals("new game")){
+                    this.controller = new ControllerSnakeGame(sortie);
                 }
-                sortie.println(inputLine);
+                else if(inputLine.equals("pause")){
+                    this.controller.pause();
+                }
+
+                
             }
             
         }catch(IOException e){e.printStackTrace();}
