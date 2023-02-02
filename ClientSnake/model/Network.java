@@ -30,8 +30,8 @@ public class Network {
     this.gameFeatures = gameFeatures;
   }
 
-  public void readGameFeatures(String Json) {
-    this.gameFeatures = new GameFeatures(Json);
+  public void readGameFeatures(String json) {
+    this.gameFeatures = new GameFeatures(json);
   }
 
   public void sendClientSignal(String signal) {

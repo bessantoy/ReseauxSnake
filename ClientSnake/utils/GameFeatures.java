@@ -139,8 +139,8 @@ public class GameFeatures {
     this.speed = speed;
   }
 
-  public void toJson() {
-    String json = "{\"walls\":" + walls + ",\"sizeX\":" + sizeX + ",\"sizeY\":" + sizeY + ",\"featuresSnakes\":"
+  public String toJson() {
+    return "{\"walls\":" + walls + ",\"sizeX\":" + sizeX + ",\"sizeY\":" + sizeY + ",\"featuresSnakes\":"
         + featuresSnakes
         + ",\"featuresItems\":" + featuresItems + ",\"state\":" + state + ",\"turn\":" + turn + ",\"speed\":" + speed
         + "}";
