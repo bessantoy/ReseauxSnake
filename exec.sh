@@ -6,7 +6,7 @@ if [ -z "$1" ]; then
 else
   if [ -d "$1" ]; then
     cd "$1"
-    file=$(find . -maxdepth 1 -iname "Main.java")
+    file=$(find . -maxdepth 1 -iname "main.java" -type f)
     if [ -f "$file" ]; then
       javac -d ./build/ $file
       filename="${file##*/}"
