@@ -166,7 +166,7 @@ public class GameFeatures {
     snakesString = snakesString.substring(0, snakesString.length() - 1);
     snakesString += "]";
 
-    return "{\"walls\":" + wallsString + ",\"sizeX\":" + sizeX + ",\"sizeY\":" + sizeY + ",\"featuresSnakes\":"
+    return "GF{\"walls\":" + wallsString + ",\"sizeX\":" + sizeX + ",\"sizeY\":" + sizeY + ",\"featuresSnakes\":"
         + snakesString
         + ",\"featuresItems\":" + itemsString + ",\"state\":" + state + ",\"turn\":" + turn + ",\"speed\":" + speed
         + "}";

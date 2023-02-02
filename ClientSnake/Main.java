@@ -4,7 +4,8 @@ import java.io.*;
 import java.util.Scanner;
 
 import model.Network;
-import view.ViewCommand; 
+import view.PanelSnakeGame;
+import view.ViewCommand;
 
 public class Main {
     private Socket clientSocket;
@@ -13,8 +14,8 @@ public class Main {
     private Network network;
     private ViewCommand viewCommand;
 
-    public void printServerMessage(String msg){
-        System.out.println("Server : "  + msg + "\n");
+    public void printServerMessage(String msg) {
+        System.out.println("Server : " + msg + "\n");
     }
 
     public void startConnection(String ip, int port) {
@@ -28,8 +29,6 @@ public class Main {
         }
 
     }
-
-    
 
     public void newGame() {
         this.network = new Network();
@@ -51,14 +50,22 @@ public class Main {
     public static void main(String[] args) {
         Main client = new Main();
         client.startConnection("localhost", 5556);
-        //client.newGame();
-        try{
+        // client.newGame();
+        try {
 
             client.sortie.println("hello");
             String response;
-            while((response = client.entree.readLine()) != "good bye"){
-                if(response.equals("new game initialized")){
+            while ((response = client.entree.readLine()) != "good bye") {
+                if (response.equals("new game initialized")) {
                     client.newGame();
+                }
+                if (response.startsWith("#JSON#GF")) {
+                    String JSON = response.substring(8);
+                    client.network.readGameFeatures(JSON);
+                    new PanelSnakeGame(client.network.getGameFeatures().getSizeX(),
+                            client.network.getGameFeatures().getSizeY(), client.network.getGameFeatures().getWalls(),
+                            client.network.getGameFeatures().getFeaturesSnakes(),
+                            client.network.getGameFeatures().getFeaturesItems());
                 }
                 client.printServerMessage(response);
                 Scanner sc = new Scanner(System.in);
@@ -66,8 +73,9 @@ public class Main {
                 String str = sc.nextLine();
                 client.sortie.println(str);
             }
-        }catch(IOException e){e.printStackTrace();}
-        
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }

@@ -3,6 +3,7 @@ package controller;
 import model.SnakeGame;
 import model.InputMap;
 import utils.AgentAction;
+import utils.GameFeatures;
 
 import java.io.*;
 
@@ -44,6 +45,11 @@ public class ControllerSnakeGame extends AbstractController {
 
 	public void goRight() {
 		this.snakeGame.setInputMoveHuman1(AgentAction.MOVE_RIGHT);
+	}
+
+	public String gameFeaturesToJson() {
+		GameFeatures gameFeatures = this.snakeGame.toGameFeatures();
+		return gameFeatures.toJson();
 	}
 
 }

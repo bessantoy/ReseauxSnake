@@ -11,8 +11,12 @@ public class Main {
     private BufferedReader entree;
     private ControllerSnakeGame controller;
 
-    public void printClientMessage(String msg){
+    public void printClientMessage(String msg) {
         System.out.println("Server : " + msg + "\n");
+    }
+
+    public void sendJSON(String json) {
+        sortie.println("#JSON#" + json);
     }
 
     public void start(int port) {
@@ -28,18 +32,19 @@ public class Main {
             while ((inputLine = entree.readLine()) != null) {
                 if (inputLine.equals("exit")) {
                     sortie.println("good bye");
-                } else if (inputLine.equals("hello")){
+                } else if (inputLine.equals("hello")) {
                     sortie.println("hello client");
-                }else if (inputLine.equals("new game")) {
+                } else if (inputLine.equals("new game")) {
                     sortie.println("new game initialized");
                     this.controller = new ControllerSnakeGame();
+                    sendJSON(this.controller.gameFeaturesToJson());
                 } else if (inputLine.equals("pause")) {
                     sortie.println("game paused");
                     this.controller.pause();
-                } else if (inputLine.equals("run")){
+                } else if (inputLine.equals("run")) {
                     sortie.println("game running");
                     this.controller.play();
-                }else if(inputLine.equals("step")){
+                } else if (inputLine.equals("step")) {
                     sortie.println("step");
                     this.controller.step();
                 }

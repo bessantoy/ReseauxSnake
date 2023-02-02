@@ -1,9 +1,8 @@
 package model;
 
 import java.io.IOException;
-import java.util.Observable;
 
-public abstract class Game extends Observable implements Runnable {
+public abstract class Game implements Runnable {
 
 	int turn;
 	int maxTurn;
@@ -13,7 +12,7 @@ public abstract class Game extends Observable implements Runnable {
 
 	long time = 100;
 
-	public Game(int maxTurn) {
+	protected Game(int maxTurn) {
 
 		this.maxTurn = maxTurn;
 
@@ -24,9 +23,6 @@ public abstract class Game extends Observable implements Runnable {
 		isRunning = true;
 
 		initializeGame();
-
-		setChanged();
-		notifyObservers();
 
 	}
 
@@ -45,9 +41,6 @@ public abstract class Game extends Observable implements Runnable {
 
 			gameOver();
 		}
-
-		setChanged();
-		notifyObservers();
 	}
 
 	public void run() {
@@ -58,7 +51,6 @@ public abstract class Game extends Observable implements Runnable {
 			try {
 				Thread.sleep(time);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
