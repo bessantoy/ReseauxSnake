@@ -12,7 +12,6 @@ else
       filename="${file##*/}"
       filename="${filename%.*}"
       cd build/
-      echo "java $filename"
       java $filename
       cd ../
     else
