@@ -15,10 +15,10 @@ public class ControllerSnakeGame extends AbstractController {
 	SnakeGame snakeGame;
 	
 	
-	public ControllerSnakeGame(DataOutputStream sortie) {
+	public ControllerSnakeGame(PrintWriter sortie) {
 		
 
-		String layoutName = "layouts/smallArena.lay";
+		String layoutName = "ServeurSnake/layouts/smallArena.lay";
 		
 		
 		InputMap inputMap = null;

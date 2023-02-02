@@ -45,12 +45,11 @@ public class SnakeGame extends Game{
 	private int sizeX;
 	private int sizeY;
 
+	PrintWriter sortie;
+
 	GameState state;
 
-	DataOutputStream sortie;
-
-
-	public SnakeGame(int maxTurn, InputMap inputMap, DataOutputStream sortie) {
+	public SnakeGame(int maxTurn, InputMap inputMap, PrintWriter sortie) {
 
 		super(maxTurn);
 
@@ -116,11 +115,7 @@ public class SnakeGame extends Game{
 			double r = rand.nextDouble();
 
 			if(r < probSpecialItem) {
-				try {
-					sortie.writeUTF("add random item");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				sortie.println("add random item");
 				addRandomItem();
 			}
 		}
@@ -153,12 +148,8 @@ public class SnakeGame extends Game{
 
 	@Override
 	public void gameOver() {
-		try {
-			sortie.writeUTF("Game over");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
+		
+		sortie.println("Game over");
 	}
 
 	public void addRandomApple() {
@@ -285,11 +276,8 @@ public class SnakeGame extends Game{
 
 	public void checkSnakeEaten() {
 
-		try {
-			sortie.writeUTF("checkSnakeEaten");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+
+		sortie.println("checkSnakeEaten");
 
 		for(Snake snake1 : snakes) {
 			if(snake1.getInvincibleTimer() < 1) {
