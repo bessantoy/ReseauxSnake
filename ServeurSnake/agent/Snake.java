@@ -2,11 +2,11 @@ package agent;
 
 import java.util.ArrayList;
 
-import model.SnakeGame;
+import model.Network;
 import strategy.Strategy;
 import utils.AgentAction;
 import utils.ColorSnake;
-
+import utils.FeaturesSnake;
 import utils.Position;
 
 public class Snake {
@@ -55,82 +55,11 @@ public class Snake {
 
 	}
 
-
-	public AgentAction play(SnakeGame game) {
-
-		return strategy.chooseAction(this,game);
-
-	}
-
-	
-
-	public void move(AgentAction action, SnakeGame game) {
-
-		Position head = this.positions.get(0);
-
-		// Store old tail position
-		this.oldTailX = this.positions.get(positions.size() - 1).getX();
-		this.oldTailY = this.positions.get(positions.size() - 1).getY();
-		
-		
-		// Move body
-		if(this.positions.size() > 1) {
-			for(int i = 1; i < this.positions.size(); i++) {	
-				
-				positions.get(positions.size() - i).setX(positions.get(positions.size() - i - 1).getX());
-				positions.get(positions.size() - i).setY(positions.get(positions.size() - i - 1).getY());
-	
-			}
-		}	
-		
-		
-		// Move head
-		switch (action) {
-		case MOVE_UP:
-			int y = positions.get(0).getY();
-			
-			if(y > 0) {
-				head.setY(positions.get(0).getY()-1);
-			} else {
-				head.setY(game.getSizeY()-1);
-			}
-			
-			break;
-		case MOVE_DOWN:
-			head.setY((positions.get(0).getY()+1)%game.getSizeY());
-			break;
-		case MOVE_RIGHT:
-			head.setX((positions.get(0).getX()+1)%game.getSizeX());
-			break;		
-		case MOVE_LEFT:
-			int x = positions.get(0).getX();
-	
-			if(x > 0) {
-				head.setX(positions.get(0).getX()-1);
-			} else {
-				head.setX(game.getSizeX()-1);
-			}
-			
-			
-			break;
-
-		default:
-			break;
-		}
-
-		this.setLastAction(action);
-		
-	}
-
-
-	public void sizeIncrease() {
-
-		this.positions.add(new Position(this.oldTailX, this.oldTailY));
-
+	public FeaturesSnake toFeaturesSnake() {
+		return new FeaturesSnake(positions, lastAction, colorSnake, invincibleTimer > 0, sickTimer > 0);
 	}
 
 	public int getSize() {
-		
 		return this.positions.size();
 	}
 
@@ -138,43 +67,24 @@ public class Snake {
 		return positions;
 	}
 
-
-
-
 	public void setPositions(ArrayList<Position> positions) {
 		this.positions = positions;
 	}
-
-
-
-
-
-
-
 
 	public Strategy getStrategy() {
 		return strategy;
 	}
 
-
-
-
-
 	public void setStrategy(Strategy strategy) {
 		this.strategy = strategy;
 	}
 
-
 	public int getX() {
-
 		return this.positions.get(0).getX();
-
 	}
 
 	public int getY() {
-
 		return this.positions.get(0).getY();
-
 	}
 
 
@@ -196,7 +106,21 @@ public class Snake {
 		this.toRemove = toRemove;
 	}
 
+	public void setOldTailX(int oldTailX) {
+		this.oldTailX = oldTailX;
+	}
 
+	public void setOldTailY(int oldTailY) {
+		this.oldTailY = oldTailY;
+	}
+
+	public int getOldTailX() {
+		return oldTailX;
+	}
+
+	public int getOldTailY() {
+		return oldTailY;
+	}
 
 	public ColorSnake getColorSnake() {
 		return colorSnake;

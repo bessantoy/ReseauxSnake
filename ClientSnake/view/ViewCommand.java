@@ -3,8 +3,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import controller.AbstractController;
-import model.Game;
+import model.Network;
+import utils.GameFeatures;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,25 +17,22 @@ public class ViewCommand implements Observer {
 	JFrame jFrame;
 	JLabel jtext;
 
-	AbstractController controller;
-
 	StateViewCommand state;
+
+	Network network;
 
 	JButton initChoice;
 	JButton pauseChoice;
 	JButton playChoice;
 	JButton stepChoice;
 	
-	public ViewCommand (AbstractController controller, Observable obs)  {
+	public ViewCommand (Network network, Observable obs)  {
 
 
 		obs.addObserver(this);
 
-		this.controller = controller;
+		this.network = network;
 		
-		
-
-
 		jFrame= new JFrame();
 		jFrame.setTitle("Bouton");
 		jFrame.setSize(new Dimension(700, 300));
@@ -62,7 +59,7 @@ public class ViewCommand implements Observer {
 		
 		initChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement){
-				controller.restart();
+				network.sendClientSignal("RESTART");
 				state.clickRestart();
 			}
 		});
@@ -70,7 +67,7 @@ public class ViewCommand implements Observer {
 		//
 		pauseChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement){
-				controller.pause();
+				network.sendClientSignal("PAUSE");
 				state.clickPause();
 			}
 		});
@@ -78,7 +75,7 @@ public class ViewCommand implements Observer {
 
 		playChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement){
-				controller.play();
+				network.sendClientSignal("RESUME");
 				state.clickPlay();
 			}
 		});
@@ -86,7 +83,7 @@ public class ViewCommand implements Observer {
 
 		stepChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement){
-				controller.step();
+				network.sendClientSignal("STEP");
 				state.clickStep();
 			}
 		});
@@ -94,19 +91,17 @@ public class ViewCommand implements Observer {
 
 		JSlider j = new JSlider(1,10);
 
-		j.setValue(2);
+		j.setValue((int)network.getGameFeatures().getSpeed());
 		j.setMajorTickSpacing(1);
 		j.setPaintTicks(true);
 		j.setPaintLabels(true);
-
-		controller.setSpeed(2);
 
 		j.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evenement) {
 				JSlider source = (JSlider)evenement.getSource();
 				if(!source.getValueIsAdjusting()) {
 					double speed = source.getValue();
-					controller.setSpeed(speed);
+					network.getGameFeatures().setSpeed((long)speed);
 					System.out.println("Vitesse changée à : " + speed);
 				}
 			}
@@ -150,7 +145,7 @@ public class ViewCommand implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 
-		Game game = (Game)o;
+		GameFeatures game = (GameFeatures)o;
 
 		jtext.setText("Tour :"+ game.getTurn());
 

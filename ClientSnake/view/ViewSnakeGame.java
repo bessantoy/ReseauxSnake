@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -12,15 +11,10 @@ import javax.swing.JFrame;
 
 
 import agent.Snake;
-import controller.ControllerSnakeGame;
 import item.Item;
 import model.SnakeGame;
-import model.Game;
-import utils.AgentAction;
-import utils.ColorSnake;
 import utils.FeaturesItem;
 import utils.FeaturesSnake;
-import utils.Position;
 
 
 public class ViewSnakeGame implements Observer{
@@ -29,12 +23,12 @@ public class ViewSnakeGame implements Observer{
 
 	PanelSnakeGame panelBomberman;
 
-	public ViewSnakeGame(ControllerSnakeGame controller, Observable obs, PanelSnakeGame panelBomberman) {
+	public ViewSnakeGame(Observable obs, PanelSnakeGame panelBomberman) {
 
 		obs.addObserver(this);
 
 
-		jFrame= new MainFrame(controller);
+		jFrame= new MainFrame();
 		
 		
 		
