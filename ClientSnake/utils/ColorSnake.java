@@ -1,5 +1,15 @@
 package utils;
 
 public enum ColorSnake {
-	Green, Red;
+	Green("green"), Red("red");
+
+	private String color;
+
+	private ColorSnake(String color) {
+		this.color = color;
+	}
+
+	public String toJson() {
+		return "{\"color\":\"" + color + "\"}";
+	}
 }

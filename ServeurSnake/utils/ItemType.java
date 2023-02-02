@@ -1,5 +1,15 @@
 package utils;
 
 public enum ItemType {
-	APPLE, BOX, SICK_BALL, INVINCIBILITY_BALL
+	APPLE("apple"), BOX("box"), SICK_BALL("sick"), INVINCIBILITY_BALL("invincibility");
+
+	private String type;
+
+	private ItemType(String type) {
+		this.type = type;
+	}
+
+	public String toJson() {
+		return "{\"type\":\"" + type + "\"}";
+	}
 }

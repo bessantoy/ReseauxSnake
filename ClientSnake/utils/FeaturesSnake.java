@@ -26,6 +26,76 @@ public class FeaturesSnake {
 
 	}
 
+	public FeaturesSnake(String json) {
+
+		positions = new ArrayList<Position>();
+
+		String[] jsonSplit = json.split(",");
+
+		for (int i = 0; i < jsonSplit.length; i++) {
+
+			if (jsonSplit[i].contains("positions")) {
+
+				String[] jsonSplit2 = jsonSplit[i].split(":");
+
+				String[] jsonSplit3 = jsonSplit2[1].split("}");
+
+				String[] jsonSplit4 = jsonSplit3[0].split("\\[");
+
+				String[] jsonSplit5 = jsonSplit4[1].split("\\}");
+
+				for (int j = 0; j < jsonSplit5.length; j++) {
+
+					String[] jsonSplit6 = jsonSplit5[j].split(",");
+
+					int x = Integer.parseInt(jsonSplit6[0].split(":")[1]);
+					int y = Integer.parseInt(jsonSplit6[1].split(":")[1]);
+
+					positions.add(new Position(x, y));
+
+				}
+
+			} else if (jsonSplit[i].contains("colorSnake")) {
+
+				String[] jsonSplit2 = jsonSplit[i].split(":");
+
+				String[] jsonSplit3 = jsonSplit2[1].split("}");
+
+				String[] jsonSplit4 = jsonSplit3[0].split("\"");
+
+				colorSnake = ColorSnake.valueOf(jsonSplit4[1]);
+
+			} else if (jsonSplit[i].contains("lastAction")) {
+
+				String[] jsonSplit2 = jsonSplit[i].split(":");
+
+				String[] jsonSplit3 = jsonSplit2[1].split("}");
+
+				String[] jsonSplit4 = jsonSplit3[0].split("\"");
+
+				lastAction = AgentAction.valueOf(jsonSplit4[1]);
+
+			} else if (jsonSplit[i].contains("isInvincible")) {
+
+				String[] jsonSplit2 = jsonSplit[i].split(":");
+
+				String[] jsonSplit3 = jsonSplit2[1].split("}");
+
+				isInvincible = Boolean.parseBoolean(jsonSplit3[0]);
+
+			} else if (jsonSplit[i].contains("isSick")) {
+
+				String[] jsonSplit2 = jsonSplit[i].split(":");
+
+				String[] jsonSplit3 = jsonSplit2[1].split("}");
+
+				isSick = Boolean.parseBoolean(jsonSplit3[0]);
+
+			}
+
+		}
+	}
+
 	public ArrayList<Position> getPositions() {
 		return positions;
 	}
@@ -64,6 +134,22 @@ public class FeaturesSnake {
 
 	public void setLastAction(AgentAction lastAction) {
 		this.lastAction = lastAction;
+	}
+
+	public String toJson() {
+
+		String json = "{\"positions\":[";
+
+		for (Position position : positions) {
+			json += position.toJson() + ",";
+		}
+
+		json = json.substring(0, json.length() - 1);
+
+		json += "],\"colorSnake\":" + colorSnake.toJson() + ",\"lastAction\":" + lastAction.toJson() + ",\"isInvincible\":"
+				+ isInvincible + ",\"isSick\":" + isSick + "}";
+
+		return json;
 	}
 
 }
