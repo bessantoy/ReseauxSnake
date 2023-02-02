@@ -10,10 +10,8 @@ import utils.GameFeatures;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Observer;
-import java.util.Observable;
 
-public class ViewCommand implements Observer {
+public class ViewCommand {
 
 	JFrame jFrame;
 	JLabel jtext;
@@ -27,9 +25,7 @@ public class ViewCommand implements Observer {
 	JButton playChoice;
 	JButton stepChoice;
 
-	public ViewCommand(Network network, Observable obs) {
-
-		obs.addObserver(this);
+	public ViewCommand(Network network) {
 
 		this.network = network;
 
@@ -134,10 +130,7 @@ public class ViewCommand implements Observer {
 		this.state = state;
 	}
 
-	@Override
-	public void update(Observable o, Object arg) {
-
-		GameFeatures game = (GameFeatures) o;
+	public void update(GameFeatures game) {
 
 		jtext.setText("Tour :" + game.getTurn());
 

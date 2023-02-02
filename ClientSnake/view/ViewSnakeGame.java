@@ -3,27 +3,18 @@ package view;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.JFrame;
 
-import agent.Snake;
-import item.Item;
-import model.SnakeGame;
-import utils.FeaturesItem;
-import utils.FeaturesSnake;
+import utils.GameFeatures;
 
-public class ViewSnakeGame implements Observer {
+public class ViewSnakeGame {
 
 	JFrame jFrame;
 
 	PanelSnakeGame panelBomberman;
 
-	public ViewSnakeGame(Observable obs, PanelSnakeGame panelBomberman) {
-
-		obs.addObserver(this);
+	public ViewSnakeGame(PanelSnakeGame panelBomberman) {
 
 		jFrame = new MainFrame();
 
@@ -48,40 +39,9 @@ public class ViewSnakeGame implements Observer {
 
 	}
 
-	@Override
-	public void update(Observable o, Object arg) {
+	public void update(GameFeatures game) {
 
-		SnakeGame snakeGame = (SnakeGame) o;
-
-		ArrayList<FeaturesSnake> featuresSnakes = new ArrayList<FeaturesSnake>();
-
-		for (Snake snake : snakeGame.getSnakes()) {
-
-			boolean isInvincible;
-			if (snake.getInvincibleTimer() > 0) {
-				isInvincible = true;
-			} else {
-				isInvincible = false;
-			}
-
-			boolean isSick;
-			if (snake.getSickTimer() > 0) {
-				isSick = true;
-			} else {
-				isSick = false;
-			}
-
-			featuresSnakes.add(
-					new FeaturesSnake(snake.getPositions(), snake.getLastAction(), snake.getColorSnake(), isInvincible, isSick));
-		}
-
-		ArrayList<FeaturesItem> featuresItem = new ArrayList<FeaturesItem>();
-
-		for (Item item : snakeGame.getItems()) {
-			featuresItem.add(new FeaturesItem(item.getX(), item.getY(), item.getItemType()));
-		}
-
-		panelBomberman.updateInfoGame(featuresSnakes, featuresItem);
+		panelBomberman.updateInfoGame(game.getFeaturesSnakes(), game.getFeaturesItems());
 
 		panelBomberman.repaint();
 
