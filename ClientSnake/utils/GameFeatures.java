@@ -32,11 +32,12 @@ public class GameFeatures {
         String[] jsonSplit3 = jsonSplit2[1].split("}");
         String[] jsonSplit4 = jsonSplit3[0].split("\\[");
         String[] jsonSplit5 = jsonSplit4[1].split("\\}");
+        walls = new boolean[jsonSplit5.length][jsonSplit5[0].split(",").length];
         for (int j = 0; j < jsonSplit5.length; j++) {
           String[] jsonSplit6 = jsonSplit5[j].split(",");
-          int x = Integer.parseInt(jsonSplit6[0].split(":")[1]);
-          int y = Integer.parseInt(jsonSplit6[1].split(":")[1]);
-          walls[x][y] = true;
+          for (int k = 0; k < jsonSplit6.length; k++) {
+            walls[j][k] = Boolean.parseBoolean(jsonSplit6[k].split(":")[1]);
+          }
         }
       } else if (jsonSplit[i].contains("sizeX")) {
         String[] jsonSplit2 = jsonSplit[i].split(":");
@@ -49,6 +50,7 @@ public class GameFeatures {
         String[] jsonSplit3 = jsonSplit2[1].split("}");
         String[] jsonSplit4 = jsonSplit3[0].split("\\[");
         String[] jsonSplit5 = jsonSplit4[1].split("\\}");
+        featuresSnakes = new ArrayList<FeaturesSnake>();
         for (int j = 0; j < jsonSplit5.length; j++) {
           featuresSnakes.add(new FeaturesSnake(jsonSplit5[j]));
         }
@@ -57,6 +59,7 @@ public class GameFeatures {
         String[] jsonSplit3 = jsonSplit2[1].split("}");
         String[] jsonSplit4 = jsonSplit3[0].split("\\[");
         String[] jsonSplit5 = jsonSplit4[1].split("\\}");
+        featuresItems = new ArrayList<FeaturesItem>();
         for (int j = 0; j < jsonSplit5.length; j++) {
           featuresItems.add(new FeaturesItem(jsonSplit5[j]));
         }
@@ -70,7 +73,7 @@ public class GameFeatures {
         String[] jsonSplit2 = jsonSplit[i].split(":");
         speed = Long.parseLong(jsonSplit2[1]);
       } else {
-        System.out.println("Error");
+        System.out.println("Error in Parsing GameFeatures");
       }
     }
   }
@@ -140,9 +143,32 @@ public class GameFeatures {
   }
 
   public String toJson() {
-    return "{\"walls\":" + walls + ",\"sizeX\":" + sizeX + ",\"sizeY\":" + sizeY + ",\"featuresSnakes\":"
-        + featuresSnakes
-        + ",\"featuresItems\":" + featuresItems + ",\"state\":" + state + ",\"turn\":" + turn + ",\"speed\":" + speed
+    String wallsString = "[";
+    for (int i = 0; i < sizeX; i++) {
+      for (int j = 0; j < sizeY; j++) {
+        if (walls[i][j]) {
+          wallsString += "{\"x\":" + i + ",\"y\":" + j + "},";
+        }
+      }
+    }
+    wallsString = wallsString.substring(0, wallsString.length() - 1);
+    wallsString += "]";
+    String itemsString = "[";
+    for (int i = 0; i < this.featuresItems.size(); i++) {
+      itemsString += this.featuresItems.get(i).toJson() + ",";
+    }
+    itemsString = itemsString.substring(0, itemsString.length() - 1);
+    itemsString += "]";
+    String snakesString = "[";
+    for (int i = 0; i < this.featuresSnakes.size(); i++) {
+      snakesString += this.featuresSnakes.get(i).toJson() + ",";
+    }
+    snakesString = snakesString.substring(0, snakesString.length() - 1);
+    snakesString += "]";
+
+    return "{\"walls\":" + wallsString + ",\"sizeX\":" + sizeX + ",\"sizeY\":" + sizeY + ",\"featuresSnakes\":"
+        + snakesString
+        + ",\"featuresItems\":" + itemsString + ",\"state\":" + state + ",\"turn\":" + turn + ",\"speed\":" + speed
         + "}";
   }
 
