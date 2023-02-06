@@ -51,7 +51,6 @@ public class SnakeGame extends Game {
 
 	@Override
 	public void initializeGame() {
-		this.state = GameState.STARTING;
 		this.walls = inputMap.get_walls().clone();
 
 		String levelAISnake = "Advanced";
