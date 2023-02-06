@@ -114,7 +114,8 @@ public class Server {
           this.server.getController().step();
           break;
         case "RESTART":
-          this.server.getController().step();
+        
+          this.server.getController().restart();
           break;
         case "SPEED":
           try {
