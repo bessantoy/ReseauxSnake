@@ -2,15 +2,17 @@ package model;
 
 import java.io.IOException;
 
+import utils.GameState;
+
 public abstract class Game implements Runnable {
 
 	int turn;
 	int maxTurn;
-	boolean isRunning;
+	GameState state;
 
 	Thread thread;
 
-	long time = 100;
+	long time = 1000;
 
 	protected Game(int maxTurn) {
 
@@ -20,7 +22,7 @@ public abstract class Game implements Runnable {
 
 	public void init() {
 		this.turn = 0;
-		isRunning = true;
+		state = GameState.STARTING;
 
 		initializeGame();
 
@@ -37,15 +39,14 @@ public abstract class Game implements Runnable {
 				e.printStackTrace();
 			}
 		} else {
-			isRunning = false;
-
+			state = GameState.OVER;
 			gameOver();
 		}
 	}
 
 	public void run() {
 
-		while (isRunning == true) {
+		while (state == GameState.STARTING || state == GameState.PLAYING) {
 
 			step();
 			try {
@@ -58,12 +59,11 @@ public abstract class Game implements Runnable {
 	}
 
 	public void pause() {
-
-		isRunning = false;
+		state = GameState.PAUSED;
 	}
 
 	public void launch() {
-		isRunning = true;
+		state = GameState.PLAYING;
 		this.thread = new Thread(this);
 		this.thread.start();
 
@@ -87,6 +87,14 @@ public abstract class Game implements Runnable {
 
 	public int getTurn() {
 		return turn;
+	}
+
+	public GameState getState() {
+		return state;
+	}
+
+	public void setState(GameState state) {
+		this.state = state;
 	}
 
 }

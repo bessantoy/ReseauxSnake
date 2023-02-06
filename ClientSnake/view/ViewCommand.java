@@ -83,7 +83,7 @@ public class ViewCommand {
 
 		JSlider j = new JSlider(1, 10);
 
-		j.setValue((int) network.getGameFeatures().getSpeed());
+		j.setValue((int) network.getGameFeatures().getSpeed() / 1000);
 		j.setMajorTickSpacing(1);
 		j.setPaintTicks(true);
 		j.setPaintLabels(true);
@@ -93,8 +93,8 @@ public class ViewCommand {
 				JSlider source = (JSlider) evenement.getSource();
 				if (!source.getValueIsAdjusting()) {
 					double speed = source.getValue();
-					network.getGameFeatures().setSpeed((long) speed);
-					System.out.println("Vitesse changée à : " + speed);
+					network.sendCommandSignal("SPEED");
+					network.sendCommandSignal(String.valueOf(speed));
 				}
 			}
 		});

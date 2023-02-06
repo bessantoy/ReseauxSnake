@@ -40,8 +40,6 @@ public class SnakeGame extends Game {
 	private int sizeX;
 	private int sizeY;
 
-	GameState state;
-
 	public SnakeGame(int maxTurn, InputMap inputMap) {
 
 		super(maxTurn);
@@ -427,7 +425,7 @@ public class SnakeGame extends Game {
 		for (Item item : this.items) {
 			itemsFeature.add(item.toFeaturesItem());
 		}
-		return new GameFeatures(walls, sizeX, sizeY, snakesFeature, itemsFeature, state, getTurn(), getTime());
+		return new GameFeatures(walls, sizeX, sizeY, snakesFeature, itemsFeature, getState(), getTurn(), getTime());
 	}
 
 	public ArrayList<Item> getItems() {

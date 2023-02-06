@@ -12,15 +12,16 @@ import java.io.*;
 public class Server {
   private ServerSocket serverSocket;
   private ArrayList<Connection> connections;
+  private ControllerSnakeGame controller;
 
   public void start(int port) {
     try {
       serverSocket = new ServerSocket(port);
-      ControllerSnakeGame controller = new ControllerSnakeGame();
+      controller = new ControllerSnakeGame();
       System.out.println("Starting server");
       connections = new ArrayList<>();
       while (true) {
-        Connection connection = new Connection(serverSocket.accept(), controller);
+        Connection connection = new Connection(serverSocket.accept(), this);
         connections.add(connection);
         connection.start();
       }
@@ -37,23 +38,40 @@ public class Server {
     }
   }
 
+  public void sendMessageToClients(String msg) {
+    for (Connection connection : connections) {
+      connection.printClientMessage(msg);
+    }
+  }
+
+  public ControllerSnakeGame getController() {
+    return this.controller;
+  }
+
   public static class Connection extends Thread {
-    private ControllerSnakeGame controller;
+    private Server server;
     private Socket client;
     private PrintWriter out;
     private BufferedReader in;
 
-    public Connection(Socket socket, ControllerSnakeGame controller) {
+    public Connection(Socket socket, Server server) {
       this.client = socket;
-      this.controller = controller;
+      this.server = server;
     }
 
     public void printClientMessage(String msg) {
-      System.out.println("Server : " + msg + "\n");
+      this.out.println(msg);
     }
 
     public void sendJSON(String json) {
       out.println("#JSON#" + json);
+    }
+
+    public void sendGameUpdate() {
+      Gson gson = new Gson();
+
+      String json = gson.toJson(this.server.getController().getGameFeatures());
+      sendJSON(json);
     }
 
     public void run() {
@@ -64,27 +82,13 @@ public class Server {
 
         String inputLine;
 
-        Gson gson = new Gson();
-        String json = gson.toJson(this.controller.getGameFeatures());
-        System.out.println("GF sent");
-        sendJSON(json);
-
         while ((inputLine = in.readLine()) != null) {
-          if (inputLine.equals("exit")) {
-            out.println("good bye");
-          } else if (inputLine.equals("hello")) {
-            out.println("hello client");
-          } else if (inputLine.equals("pause")) {
-            out.println("game paused");
-            this.controller.pause();
-          } else if (inputLine.equals("run")) {
-            out.println("game running");
-            this.controller.play();
-          } else if (inputLine.equals("step")) {
-            out.println("step");
-            this.controller.step();
-          } else if (inputLine.startsWith("#VC#")) {
+          if (inputLine.startsWith("#VC#")) {
             handleViewCommandSignals(inputLine);
+          } else if (inputLine.startsWith("#UPDATE#")) {
+            sendGameUpdate();
+          } else {
+            out.println("Unknown command : " + inputLine);
           }
         }
         in.close();
@@ -100,16 +104,26 @@ public class Server {
       System.out.println("Signal received : " + signal);
       switch (signal) {
         case "PAUSE":
-          this.controller.pause();
+          this.server.getController().pause();
           break;
         case "RESUME":
-          this.controller.play();
+          this.server.sendMessageToClients("#RESUME#");
+          this.server.getController().play();
           break;
         case "STEP":
-          this.controller.step();
+          this.server.getController().step();
           break;
         case "RESTART":
-          this.controller.step();
+          this.server.getController().step();
+          break;
+        case "SPEED":
+          try {
+            String response = in.readLine();
+            response = response.substring(4);
+            this.server.getController().setSpeed(Double.parseDouble(response));
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
           break;
         default:
           System.out.println("Unknown signal");

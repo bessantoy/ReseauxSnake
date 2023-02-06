@@ -46,7 +46,6 @@ public class ViewSnakeGame {
 	public void update(GameFeatures game) {
 
 		panelBomberman.updateInfoGame(game.getFeaturesSnakes(), game.getFeaturesItems());
-
 		panelBomberman.repaint();
 
 	}

@@ -5,17 +5,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
 
 import com.google.gson.Gson;
 
 import utils.AgentAction;
 import utils.GameFeatures;
+import utils.GameState;
 import view.PanelSnakeGame;
 import view.ViewCommand;
 import view.ViewSnakeGame;
 
-public class Network {
+public class Network extends Thread {
 
   private AgentAction inputMoveHuman;
   private GameFeatures gameFeatures;
@@ -53,37 +53,52 @@ public class Network {
 
   }
 
-  public void startServer() {
-    this.startConnection("localhost", 5556);
-    // this.newGame();
+  private void initGame() {
+    this.sortie.println("#UPDATE#");
+    String response;
     try {
-      this.sortie.println("hello");
-      String response;
-      while (!(response = this.entree.readLine()).equals("good bye")) {
-        if (response.equals("new game initialized")) {
-        }
-        if (response.startsWith("#JSON#")) {
-          String JSON = response.substring(6);
-          System.out.print(JSON);
-          this.readGameFeatures(JSON);
-          this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
-              this.getGameFeatures().getSizeX(),
-              this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
-              this.getGameFeatures().getFeaturesSnakes(),
-              this.getGameFeatures().getFeaturesItems()), this);
-          this.viewCommand = new ViewCommand(this);
-
-        }
-        this.printServerMessage(response);
-        Scanner sc = new Scanner(System.in);
-        System.out.println("commande :");
-        String str = sc.nextLine();
-        this.sortie.println(str);
+      response = this.entree.readLine();
+      if (response.startsWith("#JSON#")) {
+        String JSON = response.substring(6);
+        this.readGameFeatures(JSON);
+        this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
+            this.getGameFeatures().getSizeX(),
+            this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
+            this.getGameFeatures().getFeaturesSnakes(),
+            this.getGameFeatures().getFeaturesItems()), this);
+        this.viewCommand = new ViewCommand(this);
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
+    while (true) {
+      try {
+        this.sortie.println("#UPDATE#");
+        response = this.entree.readLine();
+        if (response.startsWith("#JSON#")) {
+          String JSON = response.substring(6);
+          this.readGameFeatures(JSON);
+          if (this.getGameFeatures().getState() != GameState.PLAYING) {
+            while (!(response = this.entree.readLine()).equals("#RESUME#")) {
+              System.out.println(response);
+            }
+            System.out.println("Game resumed");
+          }
+          this.viewSnakeGame.update(this.gameFeatures);
+        }
+        Thread.sleep(this.gameFeatures.getSpeed());
 
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  public void run() {
+    this.startConnection("localhost", 5556);
+    this.initGame();
   }
 
   public Network() {
@@ -116,7 +131,7 @@ public class Network {
   }
 
   public void sendCommandSignal(String signal) {
-    this.sortie.println("#VC#" + clientSocket.getInetAddress() + signal);
+    this.sortie.println("#VC#" + signal);
   }
 
   public void sendMovementSignal(String signal) {
