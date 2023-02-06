@@ -26,11 +26,11 @@ public class Network {
   private ViewCommand viewCommand;
   private ViewSnakeGame viewSnakeGame;
 
-  public void printServerMessage(String msg) {
+  private void printServerMessage(String msg) {
     System.out.println("Server : " + msg + "\n");
   }
 
-  public void startConnection(String ip, int port) {
+  private void startConnection(String ip, int port) {
     try {
       clientSocket = new Socket(ip, port);
       sortie = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -42,11 +42,11 @@ public class Network {
 
   }
 
-  public void newGame() {
+  private void newGame() {
     this.network = new Network();
   }
 
-  public void stopConnection() {
+  private void stopConnection() {
     try {
       entree.close();
       sortie.close();
