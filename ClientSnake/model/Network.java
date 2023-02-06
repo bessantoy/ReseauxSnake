@@ -116,7 +116,7 @@ public class Network {
   }
 
   public void sendCommandSignal(String signal) {
-    this.sortie.println("#VC#" + signal);
+    this.sortie.println("#VC#" + clientSocket.getInetAddress() + signal);
   }
 
   public void sendMovementSignal(String signal) {
