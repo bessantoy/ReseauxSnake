@@ -78,6 +78,10 @@ public class Network extends Thread {
         if (response.startsWith("#JSON#")) {
           String JSON = response.substring(6);
           this.readGameFeatures(JSON);
+          if(this.getGameFeatures().getState() == GameState.STARTING){
+            this.viewSnakeGame.update(this.gameFeatures);
+            System.out.println("heisenberg");
+          }
           if (this.getGameFeatures().getState() != GameState.PLAYING) {
             while (!(response = this.entree.readLine()).equals("#RESUME#")) {
               System.out.println(response);
