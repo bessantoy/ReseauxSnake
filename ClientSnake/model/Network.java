@@ -80,12 +80,11 @@ public class Network extends Thread {
           this.readGameFeatures(JSON);
           if (this.getGameFeatures().getState() != GameState.PLAYING) {
             while (!(response = this.entree.readLine()).equals("#RESUME#")) {
+              System.out.println(response);
             }
-            this.viewSnakeGame.update(this.gameFeatures);
             System.out.println("Game resumed");
-          } else {
-            this.viewSnakeGame.update(this.gameFeatures);
           }
+          this.viewSnakeGame.update(this.gameFeatures);
         }
         Thread.sleep(this.gameFeatures.getSpeed());
 
