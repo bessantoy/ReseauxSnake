@@ -123,7 +123,7 @@ public class Network {
     }
   }
 
-  public void sendClientSignal(String signal) {
-    // TODO
+  public void sendClientSignal(String signal) {    
+    this.sortie.println("#VC#"+signal);
   }
 }
