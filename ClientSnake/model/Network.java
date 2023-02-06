@@ -57,10 +57,9 @@ public class Network {
     this.startConnection("localhost", 5556);
     // this.newGame();
     try {
-
       this.sortie.println("hello");
       String response;
-      while (!"good bye".equals((response = this.entree.readLine()))) {
+      while (!(response = this.entree.readLine()).equals("good bye")) {
         if (response.equals("new game initialized")) {
         }
         if (response.startsWith("#JSON#")) {
