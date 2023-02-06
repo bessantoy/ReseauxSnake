@@ -6,17 +6,21 @@ import java.awt.Point;
 
 import javax.swing.JFrame;
 
+import model.Network;
 import utils.GameFeatures;
 
 public class ViewSnakeGame {
 
 	JFrame jFrame;
 
+	Network network;
+
 	PanelSnakeGame panelBomberman;
 
-	public ViewSnakeGame(PanelSnakeGame panelBomberman) {
+	public ViewSnakeGame(PanelSnakeGame panelBomberman, Network network) {
 
-		jFrame = new MainFrame();
+		this.network = network;
+		jFrame = new MainFrame(network);
 
 		jFrame.setTitle("Game");
 

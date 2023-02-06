@@ -32,10 +32,10 @@ public class Main {
             String inputLine;
 
             this.controller = new ControllerSnakeGame();
-                    Gson gson = new Gson();
-                    String json = gson.toJson(this.controller.getGameFeatures());
-                    System.out.println("GF sent");
-                    sendJSON(json);
+            Gson gson = new Gson();
+            String json = gson.toJson(this.controller.getGameFeatures());
+            System.out.println("GF sent");
+            sendJSON(json);
 
             while ((inputLine = entree.readLine()) != null) {
                 if (inputLine.equals("exit")) {
@@ -51,7 +51,7 @@ public class Main {
                 } else if (inputLine.equals("step")) {
                     sortie.println("step");
                     this.controller.step();
-                }else if (inputLine.startsWith("#VC#")){
+                } else if (inputLine.startsWith("#VC#")) {
                     handleViewCommandSignals(inputLine);
                 }
             }
@@ -60,20 +60,24 @@ public class Main {
         }
     }
 
-    public void handleViewCommandSignals(String signal){
+    public void handleViewCommandSignals(String signal) {
         signal = signal.substring(4);
-        switch(signal){
-            case "PAUSE" : 
+        System.out.println("Signal received : " + signal);
+        switch (signal) {
+            case "PAUSE":
                 this.controller.pause();
                 break;
-            case "PLAY" : 
+            case "RESUME":
                 this.controller.play();
                 break;
-            case "STEP" : 
+            case "STEP":
                 this.controller.step();
                 break;
-            case "RESTART" : 
+            case "RESTART":
                 this.controller.step();
+                break;
+            default:
+                System.out.println("Unknown signal");
                 break;
         }
     }

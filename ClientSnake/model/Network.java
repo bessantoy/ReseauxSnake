@@ -22,7 +22,6 @@ public class Network {
   private Socket clientSocket;
   private PrintWriter sortie;
   private BufferedReader entree;
-  private Network network;
   private ViewCommand viewCommand;
   private ViewSnakeGame viewSnakeGame;
 
@@ -40,10 +39,6 @@ public class Network {
       e.printStackTrace();
     }
 
-  }
-
-  private void newGame() {
-    this.network = new Network();
   }
 
   private void stopConnection() {
@@ -67,19 +62,17 @@ public class Network {
       String response;
       while (!"good bye".equals((response = this.entree.readLine()))) {
         if (response.equals("new game initialized")) {
-          this.newGame();
         }
         if (response.startsWith("#JSON#")) {
-          this.newGame();
           String JSON = response.substring(6);
           System.out.print(JSON);
-          this.network.readGameFeatures(JSON);
+          this.readGameFeatures(JSON);
           this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
-              this.network.getGameFeatures().getSizeX(),
-              this.network.getGameFeatures().getSizeY(), this.network.getGameFeatures().getWalls(),
-              this.network.getGameFeatures().getFeaturesSnakes(),
-              this.network.getGameFeatures().getFeaturesItems()));
-          this.viewCommand = new ViewCommand(this.network);
+              this.getGameFeatures().getSizeX(),
+              this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
+              this.getGameFeatures().getFeaturesSnakes(),
+              this.getGameFeatures().getFeaturesItems()), this);
+          this.viewCommand = new ViewCommand(this);
 
         }
         this.printServerMessage(response);
@@ -123,7 +116,11 @@ public class Network {
     }
   }
 
-  public void sendClientSignal(String signal) {    
-    this.sortie.println("#VC#"+signal);
+  public void sendCommandSignal(String signal) {
+    this.sortie.println("#VC#" + signal);
+  }
+
+  public void sendMovementSignal(String signal) {
+    this.sortie.println("#MV#" + signal);
   }
 }

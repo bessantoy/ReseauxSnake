@@ -22,13 +22,13 @@ public class MainFrame extends JFrame implements KeyListener {
         System.out.println("Key pressed");
 
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            network.sendClientSignal("RIGHT");
+            network.sendMovementSignal("RIGHT");
         } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            network.sendClientSignal("LEFT");
+            network.sendMovementSignal("LEFT");
         } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-            network.sendClientSignal("UP");
+            network.sendMovementSignal("UP");
         } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            network.sendClientSignal("DOWN");
+            network.sendMovementSignal("DOWN");
         }
 
     }
