@@ -54,7 +54,7 @@ public class ViewCommand {
 
 		initChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
-				network.sendClientSignal("RESTART");
+				network.sendCommandSignal("RESTART");
 				state.clickRestart();
 			}
 		});
@@ -62,21 +62,21 @@ public class ViewCommand {
 		//
 		pauseChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
-				network.sendClientSignal("PAUSE");
+				network.sendCommandSignal("PAUSE");
 				state.clickPause();
 			}
 		});
 
 		playChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
-				network.sendClientSignal("RESUME");
+				network.sendCommandSignal("RESUME");
 				state.clickPlay();
 			}
 		});
 
 		stepChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
-				network.sendClientSignal("STEP");
+				network.sendCommandSignal("STEP");
 				state.clickStep();
 			}
 		});
