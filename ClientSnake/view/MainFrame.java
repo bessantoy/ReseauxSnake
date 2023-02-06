@@ -2,12 +2,16 @@ package view;
 
 import javax.swing.JFrame;
 
+import model.Network;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class MainFrame extends JFrame implements KeyListener {
+    Network network = null;
 
-    public MainFrame() {
+    public MainFrame(Network network) {
+        this.network = network;
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -18,13 +22,13 @@ public class MainFrame extends JFrame implements KeyListener {
         System.out.println("Key pressed");
 
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            // TODO
+            network.sendClientSignal("RIGHT");
         } else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            // TODO
+            network.sendClientSignal("LEFT");
         } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-            // TODO
+            network.sendClientSignal("UP");
         } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-            // TODO
+            network.sendClientSignal("DOWN");
         }
 
     }
