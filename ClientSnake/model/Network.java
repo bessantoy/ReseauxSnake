@@ -55,48 +55,61 @@ public class Network extends Thread {
 
   private void initGame() {
     this.sortie.println("#UPDATE#");
+    this.askUpdate();
+    this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
+        this.getGameFeatures().getSizeX(),
+        this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
+        this.getGameFeatures().getFeaturesSnakes(),
+        this.getGameFeatures().getFeaturesItems()), this);
+    this.viewCommand = new ViewCommand(this);
+    play();
+  }
+
+  public void play() {
+    String response;
+    while (true) {
+      this.askUpdate();
+      this.viewSnakeGame.update(this.gameFeatures);
+      try {
+        if (this.getGameFeatures().getState() != GameState.PLAYING) {
+          while (!(response = this.entree.readLine()).equals("#RESUME#")) {
+            handleServerSignal(response);
+          }
+        }
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      try {
+        Thread.sleep(this.gameFeatures.getSpeed());
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+  }
+
+  private void askUpdate() {
     String response;
     try {
+      this.sortie.println("#UPDATE#");
       response = this.entree.readLine();
       if (response.startsWith("#JSON#")) {
         String JSON = response.substring(6);
         this.readGameFeatures(JSON);
-        this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
-            this.getGameFeatures().getSizeX(),
-            this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
-            this.getGameFeatures().getFeaturesSnakes(),
-            this.getGameFeatures().getFeaturesItems()), this);
-        this.viewCommand = new ViewCommand(this);
+      } else {
+        System.out.println(response);
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
-    while (true) {
-      try {
-        this.sortie.println("#UPDATE#");
-        response = this.entree.readLine();
-        if (response.startsWith("#JSON#")) {
-          String JSON = response.substring(6);
-          this.readGameFeatures(JSON);
-          if(this.getGameFeatures().getState() == GameState.STARTING){
-            this.viewSnakeGame.update(this.gameFeatures);
-            System.out.println("heisenberg");
-          }
-          if (this.getGameFeatures().getState() != GameState.PLAYING) {
-            while (!(response = this.entree.readLine()).equals("#RESUME#")) {
-              System.out.println(response);
-            }
-            System.out.println("Game resumed");
-          }
-          this.viewSnakeGame.update(this.gameFeatures);
-        }
-        Thread.sleep(this.gameFeatures.getSpeed());
 
-      } catch (IOException e) {
-        e.printStackTrace();
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+  }
+
+  private void handleServerSignal(String response) {
+    if (response.equals("#RESTART#")) {
+      this.askUpdate();
+      this.viewSnakeGame.update(this.gameFeatures);
     }
   }
 

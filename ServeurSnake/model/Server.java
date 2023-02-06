@@ -114,6 +114,7 @@ public class Server {
           this.server.getController().step();
           break;
         case "RESTART":
+          this.server.sendMessageToClients("#RESUME#");
           this.server.getController().restart();
           break;
         case "SPEED":

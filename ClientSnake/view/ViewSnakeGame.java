@@ -15,16 +15,16 @@ public class ViewSnakeGame {
 
 	Network network;
 
-	PanelSnakeGame panelBomberman;
+	PanelSnakeGame panelSnake;
 
-	public ViewSnakeGame(PanelSnakeGame panelBomberman, Network network) {
+	public ViewSnakeGame(PanelSnakeGame panelSnake, Network network) {
 
 		this.network = network;
 		jFrame = new MainFrame(network);
 
 		jFrame.setTitle("Game");
 
-		jFrame.setSize(new Dimension(panelBomberman.getSizeX() * 45, panelBomberman.getSizeY() * 45));
+		jFrame.setSize(new Dimension(panelSnake.getSizeX() * 45, panelSnake.getSizeY() * 45));
 		Dimension windowSize = jFrame.getSize();
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Point centerPoint = ge.getCenterPoint();
@@ -35,18 +35,17 @@ public class ViewSnakeGame {
 
 		// jFrame.setLayout(new BorderLayout());
 
-		this.panelBomberman = panelBomberman;
+		this.panelSnake = panelSnake;
 
-		jFrame.add("Center", panelBomberman);
+		jFrame.add("Center", panelSnake);
 
 		jFrame.setVisible(true);
 
 	}
 
 	public void update(GameFeatures game) {
-
-		panelBomberman.updateInfoGame(game.getFeaturesSnakes(), game.getFeaturesItems());
-		panelBomberman.repaint();
+		panelSnake.updateInfoGame(game.getFeaturesSnakes(), game.getFeaturesItems());
+		panelSnake.repaint();
 
 	}
 
