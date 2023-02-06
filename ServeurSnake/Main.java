@@ -31,17 +31,17 @@ public class Main {
             entree = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             String inputLine;
 
+            this.controller = new ControllerSnakeGame();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(this.controller.getGameFeatures());
+                    System.out.println("GF sent");
+                    sendJSON(json);
+
             while ((inputLine = entree.readLine()) != null) {
                 if (inputLine.equals("exit")) {
                     sortie.println("good bye");
                 } else if (inputLine.equals("hello")) {
                     sortie.println("hello client");
-                } else if (inputLine.equals("new game")) {
-                    this.controller = new ControllerSnakeGame();
-                    Gson gson = new Gson();
-                    String json = gson.toJson(this.controller.getGameFeatures());
-                    System.out.println("GF sent");
-                    sendJSON(json);
                 } else if (inputLine.equals("pause")) {
                     sortie.println("game paused");
                     this.controller.pause();
@@ -51,10 +51,30 @@ public class Main {
                 } else if (inputLine.equals("step")) {
                     sortie.println("step");
                     this.controller.step();
+                }else if (inputLine.startsWith("#VC#")){
+                    handleViewCommandSignals(inputLine);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void handleViewCommandSignals(String signal){
+        signal = signal.substring(4);
+        switch(signal){
+            case "PAUSE" : 
+                this.controller.pause();
+                break;
+            case "PLAY" : 
+                this.controller.play();
+                break;
+            case "STEP" : 
+                this.controller.step();
+                break;
+            case "RESTART" : 
+                this.controller.step();
+                break;
         }
     }
 
