@@ -40,7 +40,6 @@ public class SnakeGame extends Game {
 	private int sizeX;
 	private int sizeY;
 
-
 	GameState state;
 
 	public SnakeGame(int maxTurn, InputMap inputMap) {
@@ -54,7 +53,6 @@ public class SnakeGame extends Game {
 
 	@Override
 	public void initializeGame() {
-
 		this.walls = inputMap.get_walls().clone();
 
 		String levelAISnake = "Advanced";
