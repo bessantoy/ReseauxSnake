@@ -46,6 +46,8 @@ public class SnakeGame extends Game {
 
 		this.inputMap = inputMap;
 
+		this.inputMoves = new ArrayList<AgentAction>();
+
 		for (int i = 0; i < inputMoves.size(); ++i) {
 			inputMoves.set(i, AgentAction.MOVE_DOWN);
 		}

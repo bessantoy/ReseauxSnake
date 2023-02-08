@@ -39,15 +39,21 @@ public class Server {
     }
   }
 
+  public void sendInfoToClients(String msg) {
+    for (Connection connection : connections) {
+      connection.sendInfoToClient(msg);
+    }
+  }
+
   public void sendMessageToClients(String msg) {
     for (Connection connection : connections) {
-      connection.sendClientMessage(msg);
+      connection.sendMessageToClient(msg);
     }
   }
 
   public void sendMessageToPlayers(String msg) {
     for (Connection player : players) {
-      player.sendClientMessage(msg);
+      player.sendMessageToClient(msg);
     }
   }
 
@@ -66,8 +72,12 @@ public class Server {
       this.server = server;
     }
 
-    public void sendClientMessage(String msg) {
+    public void sendMessageToClient(String msg) {
       this.out.println(msg);
+    }
+
+    public void sendInfoToClient(String msg) {
+      this.out.println("Server : " + msg);
     }
 
     public void sendJSON(String json) {
@@ -96,15 +106,38 @@ public class Server {
             if (this.server.getController() != null) {
               sendGameUpdate();
             } else {
-              this.sendClientMessage("No game started");
+              this.sendMessageToClient("No game started");
             }
           } else if (inputLine.startsWith("init")) {
-            String layout = inputLine.substring(4);
+            String layout = inputLine.substring(5);
             initGame(layout);
           } else if (inputLine.equals("join")) {
             joinLobby();
+          } else if (inputLine.equals("launch")) {
+            if (this.server.getController() != null) {
+              if (this.server.players.size() > 1) {
+                this.server.getController().play();
+                this.server.sendMessageToPlayers("#LAUNCH#");
+              } else {
+                this.sendMessageToClient("Not enough players");
+              }
+            } else {
+              this.sendMessageToClient("No game initialised");
+            }
+          } else if (inputLine.equals("stop")) {
+            if (this.server.getController() != null) {
+              this.server.getController().pause();
+              this.server.sendMessageToPlayers("#PAUSE#");
+            } else {
+              this.sendMessageToClient("No game started");
+            }
+          } else if (inputLine.equals("quit")) {
+            this.server.connections.remove(this);
+            this.server.players.remove(this);
+            this.server.sendMessageToClients("Client disconnected");
+            break;
           } else {
-            this.sendClientMessage("Unknown command : " + inputLine);
+            this.sendMessageToClient("Unknown command : " + inputLine);
           }
         }
         in.close();
@@ -116,26 +149,32 @@ public class Server {
     }
 
     private void initGame(String layout) {
-      if (new File("layouts/" + layout + ".lay").exists()) {
-        this.server.controller = new ControllerSnakeGame(layout);
-        if (this.server.getController().getGameFeatures().getFeaturesSnakes().size() > this.server.players
+      if (new File("./layouts/" + layout + ".lay").exists()) {
+        this.server.controller = new ControllerSnakeGame("layouts/" + layout + ".lay");
+        System.out.println("Game started with layout : " + layout);
+        if (this.server.getController().getGameFeatures().getFeaturesSnakes().size() < this.server.players
             .size()) {
           this.server.players.clear();
           this.server.sendMessageToClients("Lobby reseted, please join again");
         }
-        this.server.sendMessageToClients("init " + layout);
+        this.server.sendInfoToClients("Game initialised with layout : " + layout);
       } else {
-        this.sendClientMessage("Unknown layout : " + layout);
+        this.sendMessageToClient("Unknown layout : " + layout);
       }
     }
 
     private void joinLobby() {
-      if (this.server.getController().getGameFeatures().getFeaturesSnakes().size() < this.server.players.size()) {
-        this.server.players.add(this);
-        this.sendClientMessage("join");
+      if (this.server.getController() != null) {
+        if (this.server.getController().getGameFeatures().getFeaturesSnakes().size() >= this.server.players.size()) {
+          this.server.players.add(this);
+          this.sendInfoToClient("You joined the lobby");
+        } else {
+          this.sendMessageToClient("Game is full");
+        }
       } else {
-        this.sendClientMessage("Game is full");
+        this.sendMessageToClient("No game started");
       }
+
     }
 
     public void handleViewCommandSignals(String signal) {

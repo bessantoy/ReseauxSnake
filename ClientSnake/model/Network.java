@@ -125,13 +125,17 @@ public class Network extends Thread {
     if (response.equals("#STEP#")) {
       this.updateView();
     }
+    if (response.equals("#LAUNCH#")) {
+      initView();
+    }
   }
 
   public void run() {
     this.startConnection("localhost", 5556);
+    new ListenServer(in).start();
     Scanner scan = new Scanner(System.in);
     String input;
-    while ((input = scan.nextLine()).equals("exit")) {
+    while (!(input = scan.nextLine()).equals("exit")) {
       this.out.println(input);
     }
     scan.close();
@@ -172,5 +176,26 @@ public class Network extends Thread {
 
   public void sendMovementSignal(String signal) {
     this.out.println("#MV#" + signal);
+  }
+
+  public static class ListenServer extends Thread {
+
+    private BufferedReader in;
+
+    public ListenServer(BufferedReader in) {
+      this.in = in;
+    }
+
+    public void run() {
+      String response;
+      try {
+        while ((response = this.in.readLine()) != null) {
+          if (response.startsWith("Server :"))
+            System.out.println(response);
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }
