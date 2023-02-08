@@ -112,6 +112,7 @@ public class Server {
           break;
         case "STEP":
           this.server.getController().step();
+          this.server.sendMessageToClients("#STEP#");
           break;
         case "RESTART":
           this.server.sendMessageToClients("#RESUME#");

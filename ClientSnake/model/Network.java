@@ -111,6 +111,10 @@ public class Network extends Thread {
       this.askUpdate();
       this.viewSnakeGame.update(this.gameFeatures);
     }
+    if (response.equals("#STEP#")) {
+      this.askUpdate();
+      this.viewSnakeGame.update(this.gameFeatures);
+    }
   }
 
   public void run() {
