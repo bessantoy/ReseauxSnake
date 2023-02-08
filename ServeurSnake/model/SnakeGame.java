@@ -35,7 +35,7 @@ public class SnakeGame extends Game {
 
 	InputMap inputMap;
 
-	private AgentAction inputMoveHuman1;
+	private ArrayList<AgentAction> inputMoves;
 
 	private int sizeX;
 	private int sizeY;
@@ -45,7 +45,10 @@ public class SnakeGame extends Game {
 		super(maxTurn);
 
 		this.inputMap = inputMap;
-		this.inputMoveHuman1 = AgentAction.MOVE_DOWN;
+
+		for (int i = 0; i < inputMoves.size(); ++i) {
+			inputMoves.set(i, AgentAction.MOVE_DOWN);
+		}
 
 	}
 
@@ -439,12 +442,12 @@ public class SnakeGame extends Game {
 
 	}
 
-	public AgentAction getInputMoveHuman1() {
-		return inputMoveHuman1;
+	public ArrayList<AgentAction> getInputMoves() {
+		return inputMoves;
 	}
 
-	public void setInputMoveHuman1(AgentAction inputMoveHuman1) {
-		this.inputMoveHuman1 = inputMoveHuman1;
+	public void setInputMoves(int i, AgentAction input) {
+		this.inputMoves.set(i, input);
 	}
 
 	public ArrayList<Snake> getSnakes() {

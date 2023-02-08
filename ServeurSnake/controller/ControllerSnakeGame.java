@@ -9,9 +9,7 @@ public class ControllerSnakeGame extends AbstractController {
 
 	SnakeGame snakeGame;
 
-	public ControllerSnakeGame() {
-
-		String layoutName = "layouts/smallArena.lay";
+	public ControllerSnakeGame(String layoutName) {
 
 		InputMap inputMap = null;
 
@@ -29,20 +27,20 @@ public class ControllerSnakeGame extends AbstractController {
 
 	}
 
-	public void goUp() {
-		this.snakeGame.setInputMoveHuman1(AgentAction.MOVE_UP);
+	public void setDirectionPlayerUp(int indexPlayer) {
+		this.snakeGame.setInputMoves(indexPlayer, AgentAction.MOVE_UP);
 	}
 
-	public void goDown() {
-		this.snakeGame.setInputMoveHuman1(AgentAction.MOVE_DOWN);
+	public void setDirectionPlayerDown(int indexPlayer) {
+		this.snakeGame.setInputMoves(indexPlayer, AgentAction.MOVE_DOWN);
 	}
 
-	public void goLeft() {
-		this.snakeGame.setInputMoveHuman1(AgentAction.MOVE_LEFT);
+	public void setDirectionPlayerLeft(int indexPlayer) {
+		this.snakeGame.setInputMoves(indexPlayer, AgentAction.MOVE_LEFT);
 	}
 
-	public void goRight() {
-		this.snakeGame.setInputMoveHuman1(AgentAction.MOVE_RIGHT);
+	public void setDirectionPlayerRight(int indexPlayer) {
+		this.snakeGame.setInputMoves(indexPlayer, AgentAction.MOVE_RIGHT);
 	}
 
 	public GameFeatures getGameFeatures() {
