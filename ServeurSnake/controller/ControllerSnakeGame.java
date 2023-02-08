@@ -14,13 +14,12 @@ public class ControllerSnakeGame extends AbstractController {
 		InputMap inputMap = null;
 
 		try {
-			inputMap = new InputMap(layoutName);
+			inputMap = new InputMap("layouts/" + layoutName + ".lay");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		this.snakeGame = new SnakeGame(10000, inputMap);
+		this.snakeGame = new SnakeGame(10000, inputMap, layoutName);
 		this.snakeGame.init();
 
 		this.game = snakeGame;
@@ -45,6 +44,10 @@ public class ControllerSnakeGame extends AbstractController {
 
 	public GameFeatures getGameFeatures() {
 		return this.snakeGame.toGameFeatures();
+	}
+
+	public SnakeGame getGame() {
+		return this.snakeGame;
 	}
 
 }

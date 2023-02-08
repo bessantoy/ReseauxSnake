@@ -32,6 +32,7 @@ public abstract class Game implements Runnable {
 
 		if (this.gameContinue() & turn < maxTurn) {
 			turn++;
+			System.out.println("Turn : " + turn);
 			try {
 				takeTurn();
 			} catch (IOException e) {

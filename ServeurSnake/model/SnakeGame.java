@@ -40,11 +40,15 @@ public class SnakeGame extends Game {
 	private int sizeX;
 	private int sizeY;
 
-	public SnakeGame(int maxTurn, InputMap inputMap) {
+	private String layout;
+
+	public SnakeGame(int maxTurn, InputMap inputMap, String layout) {
 
 		super(maxTurn);
 
 		this.inputMap = inputMap;
+
+		this.layout = layout;
 
 		this.inputMoves = new ArrayList<AgentAction>();
 
@@ -266,8 +270,6 @@ public class SnakeGame extends Game {
 
 	public void checkSnakeEaten() {
 
-		System.out.println("checkSnakeEaten");
-
 		for (Snake snake1 : snakes) {
 			if (snake1.getInvincibleTimer() < 1) {
 				for (Snake snake2 : snakes) {
@@ -474,6 +476,14 @@ public class SnakeGame extends Game {
 
 	public void setSizeY(int sizeY) {
 		this.sizeY = sizeY;
+	}
+
+	public String getLayout() {
+		return layout;
+	}
+
+	public void setLayout(String layout) {
+		this.layout = layout;
 	}
 
 }
