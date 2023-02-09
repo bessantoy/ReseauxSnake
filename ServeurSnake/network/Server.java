@@ -65,6 +65,12 @@ public class Server {
     return false;
   }
 
+  public void sendLobbyInfoToPlayers() {
+    for (Human human : players) {
+      human.getClient().sendLobbyInfoToClient();
+    }
+  }
+
   public boolean isGameInitialised() {
     return this.controller != null;
   }

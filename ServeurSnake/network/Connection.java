@@ -79,7 +79,7 @@ public class Connection extends Thread {
     }
   }
 
-  public void handleViewCommandSignals(String signal) {
+  private void handleViewCommandSignals(String signal) {
     signal = signal.substring(4);
     System.out.println("Signal received : " + signal);
     if (this.server.isGameInitialised()) {
@@ -139,7 +139,9 @@ public class Connection extends Thread {
   }
 
   private boolean handleMessage(String inputLine) {
-    if (inputLine.startsWith("init ")) {
+    if (inputLine.equals("init")) {
+      initGame("arena");
+    } else if (inputLine.startsWith("init ")) {
       String layout = inputLine.substring(5);
       initGame(layout);
     } else if (inputLine.equals("join")) {
@@ -149,30 +151,18 @@ public class Connection extends Thread {
       joinLobby(name);
     } else if (inputLine.equals("launch")) {
       this.handleLaunch();
+    } else if (inputLine.equals("ijl")) {
+      initGame("arena");
+      joinLobby("Anonym");
+      this.handleLaunch();
     } else if (inputLine.equals("leave lobby")) {
       this.server.getPlayers().remove(this.server.getPlayer(this));
+      this.sendInfoToClient("You left the lobby");
+      this.server.sendLobbyInfoToPlayers();
     } else if (inputLine.equals("reset lobby")) {
       this.server.getPlayers().clear();
     } else if (inputLine.startsWith("level ")) {
-      inputLine = inputLine.substring(6);
-      int difficulty;
-      try {
-        difficulty = Integer.parseInt(inputLine);
-        switch (difficulty) {
-          case 1:
-            this.server.setLevelAI("Random");
-            this.server.sendInfoToClients("Difficulty set to " + difficulty);
-            break;
-          case 2:
-            this.server.setLevelAI("Advanced");
-            this.server.sendInfoToClients("Difficulty set to " + difficulty);
-            break;
-          default:
-            sendInfoToClient(difficulty + " is not a difficulty (1-2)");
-        }
-      } catch (NumberFormatException e) {
-        this.sendInfoToClient(inputLine + "is not a difficulty (1-2)");
-      }
+      handleLevelChange(inputLine);
     } else if (inputLine.equals("lobby")) {
       this.sendLobbyInfoToClient();
     } else if (inputLine.equals("exit")) {
@@ -225,7 +215,7 @@ public class Connection extends Thread {
             .size()) {
           this.server.getPlayers().add(new Human(this, name));
           this.sendInfoToClient("You joined the lobby");
-          this.sendLobbyInfoToClient();
+          this.server.sendLobbyInfoToPlayers();
         } else {
           this.sendDataToClient("Game is full");
         }
@@ -237,7 +227,7 @@ public class Connection extends Thread {
     }
   }
 
-  private void sendLobbyInfoToClient() {
+  public void sendLobbyInfoToClient() {
     this.sendInfoToClient("Lobby Infos : ");
     if (this.server.isGameInitialised()) {
       if (!this.server.getPlayers().isEmpty()) {
@@ -253,17 +243,27 @@ public class Connection extends Thread {
     } else {
       this.sendDataToClient("No game started");
     }
-
   }
 
-  private void sendLobbyInfoToClients() {
-    this.server.sendInfoToClients("Lobby Infos : ");
-    if (!this.server.getPlayers().isEmpty()) {
-      for (int i = 0; i < this.server.getPlayers().size(); ++i) {
-        this.server.sendDataToClients("    " + this.server.getPlayers().get(i).getUsername());
+  private void handleLevelChange(String inputLine) {
+    inputLine = inputLine.substring(6);
+    int difficulty;
+    try {
+      difficulty = Integer.parseInt(inputLine);
+      switch (difficulty) {
+        case 1:
+          this.server.setLevelAI("Random");
+          this.server.sendInfoToClients("Difficulty set to " + difficulty);
+          break;
+        case 2:
+          this.server.setLevelAI("Advanced");
+          this.server.sendInfoToClients("Difficulty set to " + difficulty);
+          break;
+        default:
+          sendInfoToClient(difficulty + " is not a difficulty (1-2)");
       }
-    } else {
-      this.server.sendDataToClients("You seem to be alone in this lobby");
+    } catch (NumberFormatException e) {
+      this.sendInfoToClient(inputLine + "is not a difficulty (1-2)");
     }
   }
 }
