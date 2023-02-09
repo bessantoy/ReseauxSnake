@@ -2,6 +2,7 @@ package network;
 
 import java.net.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import controller.ControllerSnakeGame;
 
@@ -10,8 +11,9 @@ import java.io.*;
 public class Server {
   private ServerSocket serverSocket;
   private ArrayList<Connection> clients;
-  private ArrayList<Player> players;
+  private ArrayList<Human> players;
   private ControllerSnakeGame controller;
+  private String levelAI = "Advanced";
 
   public void start(int port) {
     try {
@@ -50,7 +52,7 @@ public class Server {
   }
 
   public void sendMessageToPlayers(String msg) {
-    for (Player player : players) {
+    for (Human player : players) {
       player.getClient().sendDataToClient(msg);
     }
   }
@@ -63,15 +65,24 @@ public class Server {
     return false;
   }
 
+  public boolean isGameInitialised() {
+    return this.controller != null;
+  }
+
+  public void loadGame() {
+    this.controller.setPlayers(players);
+    this.controller.setLevelAI(levelAI);
+  }
+
   public ControllerSnakeGame getController() {
     return this.controller;
   }
 
-  public ArrayList<Player> getPlayers() {
+  public List<Human> getPlayers() {
     return this.players;
   }
 
-  public Player getPlayer(Connection client) {
+  public Human getPlayer(Connection client) {
     for (int i = 0; i < this.getPlayers().size(); ++i) {
       if (this.getPlayers().get(i).isClient(client))
         return this.getPlayers().get(i);
@@ -79,12 +90,20 @@ public class Server {
     return null;
   }
 
-  public ArrayList<Connection> getClients() {
+  public List<Connection> getClients() {
     return this.clients;
   }
 
   public void setController(ControllerSnakeGame controller) {
     this.controller = controller;
+  }
+
+  public String getLevelAI() {
+    return levelAI;
+  }
+
+  public void setLevelAI(String levelAI) {
+    this.levelAI = levelAI;
   }
 
 }

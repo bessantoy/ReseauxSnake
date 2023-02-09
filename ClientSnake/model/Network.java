@@ -25,18 +25,22 @@ public class Network extends Thread {
   private BufferedReader in;
   private ViewCommand viewCommand;
   private ViewSnakeGame viewSnakeGame;
-  private ServerListener serverListener;
 
-  private void sendServerMessage(String msg) {
-    System.out.println("Server : " + msg + "\n");
-  }
-
-  private void startConnection(String ip, int port) {
+  public void run() {
     try {
-      clientSocket = new Socket(ip, port);
+      clientSocket = new Socket("localhost", 5556);
       out = new PrintWriter(clientSocket.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-      System.out.println("Connected to server \n\n");
+      System.out.println("Connected to server");
+      new ServerListener(this, in).start();
+      Scanner scan = new Scanner(System.in);
+      String input;
+      while (!(input = scan.nextLine()).equals("exit")) {
+        this.out.println(input);
+      }
+      this.out.println(input);
+      scan.close();
+      this.stopConnection();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -56,20 +60,17 @@ public class Network extends Thread {
   }
 
   public void play() {
-    while (true) {
-      this.updateView();
-      if (this.getGameFeatures().getState() != GameState.PLAYING) {
-        break;
-      }
-      try {
-        Thread.sleep(this.gameFeatures.getSpeed());
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+    this.updateView();
+    try {
+      Thread.sleep(this.gameFeatures.getSpeed());
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+      this.interrupt();
     }
   }
 
   private void updateView() {
+    System.out.println("Update view");
     this.out.println("#UPDATE#");
   }
 
@@ -87,38 +88,12 @@ public class Network extends Thread {
     } else if (response.equals("#LAUNCH#")) {
       initView();
     } else if (response.startsWith("#UPDATE#")) {
-      System.out.println("update");
       response = response.substring(8);
-      if (!response.equals("-1")) {
-        this.readGameFeatures(response);
-        this.viewSnakeGame.update(this.gameFeatures);
-        this.viewCommand.update(this.gameFeatures);
-      }
+      this.handleUpdate(response);
     } else if (response.startsWith("#INIT#")) {
       response = response.substring(6);
-      if (!response.equals("-1")) {
-        this.readGameFeatures(response);
-        this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
-            this.getGameFeatures().getSizeX(),
-            this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
-            this.getGameFeatures().getFeaturesSnakes(),
-            this.getGameFeatures().getFeaturesItems()), this);
-        this.viewCommand = new ViewCommand(this);
-        play();
-      }
+      this.handleInit(response);
     }
-  }
-
-  public void run() {
-    this.startConnection("localhost", 5556);
-    this.serverListener = new ServerListener(this, in);
-    this.serverListener.start();
-    Scanner scan = new Scanner(System.in);
-    String input;
-    while (!(input = scan.nextLine()).equals("exit")) {
-      this.out.println(input);
-    }
-    scan.close();
   }
 
   public Network() {
@@ -140,6 +115,29 @@ public class Network extends Thread {
 
   public void setGameFeatures(GameFeatures gameFeatures) {
     this.gameFeatures = gameFeatures;
+  }
+
+  public void handleUpdate(String response) {
+    if (!response.equals("-1")) {
+      this.readGameFeatures(response);
+      this.viewSnakeGame.update(this.gameFeatures);
+      this.viewCommand.update(this.gameFeatures);
+      if (this.gameFeatures.getState() == GameState.PLAYING)
+        this.play();
+    }
+  }
+
+  public void handleInit(String response) {
+    if (!response.equals("-1")) {
+      this.readGameFeatures(response);
+      this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
+          this.getGameFeatures().getSizeX(),
+          this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
+          this.getGameFeatures().getFeaturesSnakes(),
+          this.getGameFeatures().getFeaturesItems()), this);
+      this.viewCommand = new ViewCommand(this);
+      play();
+    }
   }
 
   public void readGameFeatures(String json) {

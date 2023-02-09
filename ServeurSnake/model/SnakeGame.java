@@ -9,52 +9,48 @@ import agent.Snake;
 import factory.SnakeFactory;
 
 import item.Item;
+import network.Human;
+import network.AI;
 import utils.AgentAction;
 import utils.FeaturesItem;
 import utils.FeaturesSnake;
 import utils.GameFeatures;
-import utils.GameState;
 import utils.ItemType;
 import utils.Position;
-import java.io.*;
 
 public class SnakeGame extends Game {
 
 	/// A revoir
 
-	public static int timeInvincible = 20;
-	public static int timeSick = 20;
+	public static final int TIME_INVINCIBLE = 20;
+	public static final int TIME_SICK = 20;
 
 	double probSpecialItem = 1;
-
-	private ArrayList<FeaturesSnake> start_snakes;
-	private ArrayList<FeaturesItem> start_items;
 
 	private ArrayList<Snake> snakes;
 	private ArrayList<Item> items;
 
 	InputMap inputMap;
 
-	private ArrayList<AgentAction> inputMoves;
-
 	private int sizeX;
 	private int sizeY;
 
 	private String layout;
 
-	public SnakeGame(int maxTurn, InputMap inputMap, String layout) {
+	List<Human> players;
+	List<AI> aiList;
+
+	private String levelAI;
+
+	Random rand = new Random();
+
+	public SnakeGame(int maxTurn, InputMap inputMap, List<Human> players, String levelAI) {
 
 		super(maxTurn);
-
 		this.inputMap = inputMap;
-
-		this.layout = layout;
-
-		this.inputMoves = new ArrayList<AgentAction>();
-
-		for (int i = 0; i < inputMoves.size(); ++i) {
-			inputMoves.set(i, AgentAction.MOVE_DOWN);
-		}
+		this.players = players;
+		this.levelAI = levelAI;
+		this.aiList = new ArrayList<>();
 
 	}
 
@@ -62,23 +58,30 @@ public class SnakeGame extends Game {
 	public void initializeGame() {
 		this.walls = inputMap.get_walls().clone();
 
-		String levelAISnake = "Advanced";
 		SnakeFactory snakeFactory = new SnakeFactory();
 
-		start_snakes = inputMap.getStart_snakes();
-		start_items = inputMap.getStart_items();
+		ArrayList<FeaturesSnake> startSnakes = inputMap.getStart_snakes();
+		ArrayList<FeaturesItem> startItems = inputMap.getStart_items();
 
 		this.sizeX = inputMap.getSizeX();
 		this.sizeY = inputMap.getSizeY();
 
-		snakes = new ArrayList<Snake>();
-		items = new ArrayList<Item>();
+		snakes = new ArrayList<>();
+		items = new ArrayList<>();
 
-		for (FeaturesSnake featuresSnake : start_snakes) {
-			snakes.add(snakeFactory.createSnake(featuresSnake, levelAISnake));
+		int iaCount = 0;
+
+		for (int i = 0; i < startSnakes.size(); ++i) {
+			FeaturesSnake featuresSnake = startSnakes.get(i);
+			if (i < players.size()) {
+				snakes.add(snakeFactory.createSnake(featuresSnake, i));
+			} else {
+				aiList.add(new AI("IA" + iaCount++, levelAI));
+				snakes.add(snakeFactory.createSnake(featuresSnake, i, levelAI));
+			}
 		}
 
-		for (FeaturesItem featuresItem : start_items) {
+		for (FeaturesItem featuresItem : startItems) {
 			items.add(new Item(featuresItem.getX(), featuresItem.getY(), featuresItem.getItemType()));
 		}
 	}
@@ -98,7 +101,6 @@ public class SnakeGame extends Game {
 			} else {
 				moveSnake(snake.getLastAction(), snake);
 			}
-
 		}
 
 		checkSnakeEaten();
@@ -108,7 +110,6 @@ public class SnakeGame extends Game {
 
 		if (isAppleEaten) {
 			addRandomApple();
-			Random rand = new Random();
 			double r = rand.nextDouble();
 
 			if (r < probSpecialItem) {
@@ -123,19 +124,11 @@ public class SnakeGame extends Game {
 
 	public boolean isLegalMove(Snake snake, AgentAction action) {
 
-		if (snake.getSize() > 1) {
-			if (snake.getLastAction() == AgentAction.MOVE_DOWN && action == AgentAction.MOVE_UP) {
-				return false;
-			} else if (snake.getLastAction() == AgentAction.MOVE_UP && action == AgentAction.MOVE_DOWN) {
-				return false;
-			} else if (snake.getLastAction() == AgentAction.MOVE_LEFT && action == AgentAction.MOVE_RIGHT) {
-				return false;
-			} else if (snake.getLastAction() == AgentAction.MOVE_RIGHT && action == AgentAction.MOVE_LEFT) {
-				return false;
-			}
-		}
-		return true;
-
+		return !(snake.getSize() > 1
+				&& ((snake.getLastAction() == AgentAction.MOVE_DOWN && action == AgentAction.MOVE_UP) ||
+						(snake.getLastAction() == AgentAction.MOVE_UP && action == AgentAction.MOVE_DOWN) ||
+						(snake.getLastAction() == AgentAction.MOVE_LEFT && action == AgentAction.MOVE_RIGHT) ||
+						(snake.getLastAction() == AgentAction.MOVE_RIGHT && action == AgentAction.MOVE_LEFT)));
 	}
 
 	@Override
@@ -154,12 +147,11 @@ public class SnakeGame extends Game {
 		boolean notPlaced = true;
 
 		while (notPlaced) {
-			Random rand = new Random();
 
 			int x = rand.nextInt(this.inputMap.getSizeX());
 			int y = rand.nextInt(this.inputMap.getSizeY());
 
-			if (!this.walls[x][y] & !isSnake(x, y) & !isItem(x, y)) {
+			if (!this.walls[x][y] && !isSnake(x, y) && !isItem(x, y)) {
 
 				this.items.add(new Item(x, y, ItemType.APPLE));
 				notPlaced = false;
@@ -168,8 +160,6 @@ public class SnakeGame extends Game {
 	}
 
 	public void addRandomItem() {
-
-		Random rand = new Random();
 
 		int r = rand.nextInt(3);
 
@@ -202,7 +192,7 @@ public class SnakeGame extends Game {
 
 			for (Position pos : snake.getPositions()) {
 
-				if (pos.getX() == x & pos.getY() == y) {
+				if (pos.getX() == x && pos.getY() == y) {
 					return true;
 				}
 			}
@@ -214,7 +204,7 @@ public class SnakeGame extends Game {
 	public boolean isItem(int x, int y) {
 
 		for (Item item : items) {
-			if (item.getX() == x & item.getY() == y) {
+			if (item.getX() == x && item.getY() == y) {
 				return true;
 			}
 		}
@@ -233,33 +223,31 @@ public class SnakeGame extends Game {
 					int x = snake.getPositions().get(0).getX();
 					int y = snake.getPositions().get(0).getY();
 
-					if (item.getX() == x & item.getY() == y) {
+					if (item.getX() == x && item.getY() == y) {
 
 						iterItem.remove();
 
 						if (item.getItemType() == ItemType.APPLE) {
 							increaseSizeSnake(snake);
-							;
 							isAppleEaten = true;
 						}
 
 						if (item.getItemType() == ItemType.BOX) {
-							Random rand = new Random();
 							double r = rand.nextDouble();
 							if (r < 0.5) {
-								snake.setInvincibleTimer(timeInvincible);
+								snake.setInvincibleTimer(TIME_INVINCIBLE);
 
 							} else {
-								snake.setSickTimer(timeSick);
+								snake.setSickTimer(TIME_SICK);
 							}
 						}
 
 						if (item.getItemType() == ItemType.SICK_BALL) {
-							snake.setSickTimer(this.timeSick);
+							snake.setSickTimer(SnakeGame.TIME_SICK);
 						}
 
 						if (item.getItemType() == ItemType.INVINCIBILITY_BALL) {
-							snake.setInvincibleTimer(this.timeInvincible);
+							snake.setInvincibleTimer(SnakeGame.TIME_INVINCIBLE);
 						}
 					}
 				}
@@ -276,23 +264,14 @@ public class SnakeGame extends Game {
 					int x2 = snake2.getPositions().get(0).getX();
 					int y2 = snake2.getPositions().get(0).getY();
 
-					if (snake1.getId() != snake2.getId()) {
-
-						if (x2 == snake1.getPositions().get(0).getX() && y2 == snake1.getPositions().get(0).getY()) {
-
-							if (snake1.getSize() <= snake2.getSize()) {
-								snake1.setToRemove(true);
-
-							}
-
-						}
-
+					if ((snake1.getId() != snake2.getId())
+							&& (x2 == snake1.getPositions().get(0).getX() && y2 == snake1.getPositions().get(0).getY())
+							&& (snake1.getSize() <= snake2.getSize())) {
+						snake1.setToRemove(true);
 					}
 
 					for (int i = 1; i < snake1.getPositions().size(); i++) {
-
 						if (x2 == snake1.getPositions().get(i).getX() && y2 == snake1.getPositions().get(i).getY()) {
-
 							snake1.setToRemove(true);
 						}
 					}
@@ -316,27 +295,18 @@ public class SnakeGame extends Game {
 	}
 
 	public void removeSnake() {
-
 		ListIterator<Snake> iterSnake = snakes.listIterator();
 
 		while (iterSnake.hasNext()) {
-
 			Snake snake = iterSnake.next();
-
 			if (snake.isToRemove()) {
-
 				iterSnake.remove();
-
 			}
-
 		}
-
 	}
 
 	public AgentAction playSnake(Snake snake) {
-
 		return snake.getStrategy().chooseAction(snake, this);
-
 	}
 
 	public void moveSnake(AgentAction action, Snake snake) {
@@ -362,13 +332,11 @@ public class SnakeGame extends Game {
 		switch (action) {
 			case MOVE_UP:
 				int y = positions.get(0).getY();
-
 				if (y > 0) {
 					head.setY(positions.get(0).getY() - 1);
 				} else {
 					head.setY(this.getSizeY() - 1);
 				}
-
 				break;
 			case MOVE_DOWN:
 				head.setY((positions.get(0).getY() + 1) % this.getSizeY());
@@ -384,21 +352,16 @@ public class SnakeGame extends Game {
 				} else {
 					head.setX(this.getSizeX() - 1);
 				}
-
 				break;
 
 			default:
 				break;
 		}
-
 		snake.setLastAction(action);
-
 	}
 
 	public void increaseSizeSnake(Snake snake) {
-
 		snake.getPositions().add(new Position(snake.getOldTailX(), snake.getOldTailY()));
-
 	}
 
 	public void updateSnakeTimers() {
@@ -406,21 +369,16 @@ public class SnakeGame extends Game {
 		ListIterator<Snake> iter = snakes.listIterator();
 
 		while (iter.hasNext()) {
-
 			Snake snake = iter.next();
 
 			if (snake.getInvincibleTimer() > 0) {
-
 				snake.setInvincibleTimer(snake.getInvincibleTimer() - 1);
 			}
 
 			if (snake.getSickTimer() > 0) {
-
 				snake.setSickTimer(snake.getSickTimer() - 1);
 			}
-
 		}
-
 	}
 
 	public GameFeatures toGameFeatures() {
@@ -435,31 +393,31 @@ public class SnakeGame extends Game {
 		return new GameFeatures(walls, sizeX, sizeY, snakesFeature, itemsFeature, getState(), getTurn(), getTime());
 	}
 
-	public ArrayList<Item> getItems() {
+	public List<Human> getPlayers() {
+		return players;
+	}
+
+	public void setPlayers(List<Human> players) {
+		this.players = players;
+	}
+
+	public List<Item> getItems() {
 		return items;
 	}
 
-	private boolean walls[][];
+	private boolean[][] walls;
 
 	public boolean[][] getWalls() {
 		return walls;
 
 	}
 
-	public ArrayList<AgentAction> getInputMoves() {
-		return inputMoves;
-	}
-
-	public void setInputMoves(int i, AgentAction input) {
-		this.inputMoves.set(i, input);
-	}
-
-	public ArrayList<Snake> getSnakes() {
+	public List<Snake> getSnakes() {
 		return snakes;
 	}
 
-	public void setSnakes(ArrayList<Snake> snakes) {
-		this.snakes = snakes;
+	public void setSnakes(List<Snake> snakes) {
+		this.snakes = new ArrayList<>(snakes);
 	}
 
 	public int getSizeX() {
