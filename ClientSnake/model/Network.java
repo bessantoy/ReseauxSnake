@@ -13,6 +13,9 @@ import utils.AgentAction;
 import utils.GameFeatures;
 import utils.GameState;
 import view.PanelSnakeGame;
+import view.StateRunning;
+import view.StateStarting;
+import view.StateWaiting;
 import view.ViewCommand;
 import view.ViewSnakeGame;
 
@@ -60,13 +63,14 @@ public class Network extends Thread {
   }
 
   public void play() {
-    this.updateView();
     try {
       Thread.sleep(this.gameFeatures.getSpeed());
     } catch (InterruptedException e) {
       e.printStackTrace();
       this.interrupt();
     }
+    this.updateView();
+
   }
 
   private void updateView() {
@@ -82,7 +86,7 @@ public class Network extends Thread {
     if (response.equals("#RESTART#")) {
       this.updateView();
     } else if (response.equals("#RESUME#")) {
-      this.play();
+      this.updateView();
     } else if (response.equals("#STEP#")) {
       this.updateView();
     } else if (response.equals("#LAUNCH#")) {
@@ -147,7 +151,6 @@ public class Network extends Thread {
       System.out.println("Error: gameFeatures is null");
     }
   }
-
   public void sendCommandSignal(String signal) {
     this.out.println("#VC#" + signal);
   }

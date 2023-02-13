@@ -127,6 +127,22 @@ public class ViewCommand {
 	public void update(GameFeatures game) {
 
 		jtext.setText("Tour :" + game.getTurn());
+		switch(game.getState()){
+			case PLAYING: 
+			this.setState(new StateRunning(this)); 
+			break;
+			case PAUSED: 
+			this.setState(new StateWaiting(this));
+			break;
+			case OVER:
+			this.setState(new StateWaiting(this));
+			break;
+			case STARTING:
+				this.setState(new StateStarting(this)); 
+			break;
+			
+		}
+		  
 
 	}
 
