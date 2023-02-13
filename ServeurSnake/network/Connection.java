@@ -86,8 +86,9 @@ public class Connection extends Thread {
           this.server.getController().pause();
           break;
         case "RESUME":
-          this.server.sendMessageToPlayers("RESUME");
           this.server.getController().play();
+          this.server.sendMessageToPlayers("RESUME");
+
           break;
         case "STEP":
           this.server.getController().step();

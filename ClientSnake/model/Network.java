@@ -14,6 +14,9 @@ import utils.GameState;
 import utils.LobbyFeatures;
 import view.PanelSnakeGame;
 import view.ViewClient;
+import view.StateRunning;
+import view.StateStarting;
+import view.StateWaiting;
 import view.ViewCommand;
 import view.ViewSnakeGame;
 
@@ -60,13 +63,14 @@ public class Network extends Thread {
   }
 
   public void play() {
-    this.updateView();
     try {
       Thread.sleep(this.gameFeatures.getSpeed());
     } catch (InterruptedException e) {
       e.printStackTrace();
       this.interrupt();
     }
+    this.updateView();
+
   }
 
   private void updateView() {
@@ -78,7 +82,7 @@ public class Network extends Thread {
     if (signal.equals("RESTART")) {
       this.updateView();
     } else if (signal.equals("RESUME")) {
-      this.play();
+      this.updateView();
     } else if (signal.equals("STEP")) {
       this.updateView();
     } else if (signal.equals("LAUNCH")) {
