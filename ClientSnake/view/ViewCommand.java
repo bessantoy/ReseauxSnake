@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 
 public class ViewCommand {
 
-	JFrame jFrame;
+	private JPanel panelMain;
 	JLabel jtext;
 
 	StateViewCommand state;
@@ -25,32 +25,24 @@ public class ViewCommand {
 	JButton playChoice;
 	JButton stepChoice;
 
-	public ViewCommand(Network network) {
+	public ViewCommand(Network network, JFrame mainFrame) {
 
 		this.network = network;
 
-		jFrame = new JFrame();
-		jFrame.setTitle("Bouton");
-		jFrame.setSize(new Dimension(700, 300));
-		Dimension windowSize = jFrame.getSize();
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Point centerPoint = ge.getCenterPoint();
+		panelMain = new JPanel(new GridLayout(2, 1));
+		panelMain.setMaximumSize(new Dimension(1000, 100));
 
-		int dx = centerPoint.x - windowSize.width / 2 + 1000;
-		int dy = centerPoint.y - windowSize.height / 2 - 350;
-		jFrame.setLocation(dx, dy);
+		Icon iconRestart = new ImageIcon("icons/icon_restart.png");
+		initChoice = new JButton(iconRestart);
 
-		Icon icon_restart = new ImageIcon("icons/icon_restart.png");
-		initChoice = new JButton(icon_restart);
+		Icon iconPlay = new ImageIcon("icons/icon_play.png");
+		playChoice = new JButton(iconPlay);
 
-		Icon icon_play = new ImageIcon("icons/icon_play.png");
-		playChoice = new JButton(icon_play);
+		Icon iconStep = new ImageIcon("icons/icon_step.png");
+		stepChoice = new JButton(iconStep);
 
-		Icon icon_step = new ImageIcon("icons/icon_step.png");
-		stepChoice = new JButton(icon_step);
-
-		Icon icon_pause = new ImageIcon("icons/icon_pause.png");
-		pauseChoice = new JButton(icon_pause);
+		Icon iconPause = new ImageIcon("icons/icon_pause.png");
+		pauseChoice = new JButton(iconPause);
 
 		initChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
@@ -99,7 +91,7 @@ public class ViewCommand {
 			}
 		});
 
-		jFrame.setLayout(new GridLayout(2, 1));
+		panelMain.setLayout(new GridLayout(2, 1));
 
 		JPanel haut = new JPanel();
 		haut.setLayout(new GridLayout(1, 4));
@@ -108,19 +100,21 @@ public class ViewCommand {
 		haut.add(playChoice);
 		haut.add(stepChoice);
 
-		jFrame.add(haut);
+		panelMain.add(haut);
 
 		JPanel bas = new JPanel();
 		bas.setLayout(new GridLayout(1, 2));
 
 		bas.add(j);
 
-		jtext = new JLabel("Tour : ", JLabel.CENTER);
+		jtext = new JLabel("Tour : ", SwingConstants.CENTER);
 
 		bas.add(jtext);
-		jFrame.add(bas);
+		panelMain.add(bas);
 
-		jFrame.setVisible(true);
+		mainFrame.add("South", panelMain);
+
+		panelMain.setVisible(true);
 
 		state = new StateStarting(this);
 

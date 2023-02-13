@@ -135,7 +135,7 @@ public class Network extends Thread {
           this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
           this.getGameFeatures().getFeaturesSnakes(),
           this.getGameFeatures().getFeaturesItems()), this);
-      this.viewCommand = new ViewCommand(this);
+      this.viewCommand = new ViewCommand(this, this.viewSnakeGame.getjFrame());
       play();
     }
   }

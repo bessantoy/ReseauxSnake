@@ -11,11 +11,11 @@ import utils.GameFeatures;
 
 public class ViewSnakeGame {
 
-	JFrame jFrame;
+	private JFrame jFrame;
 
-	Network network;
+	private Network network;
 
-	PanelSnakeGame panelSnake;
+	private PanelSnakeGame panelSnake;
 
 	public ViewSnakeGame(PanelSnakeGame panelSnake, Network network) {
 
@@ -24,7 +24,7 @@ public class ViewSnakeGame {
 
 		jFrame.setTitle("Game");
 
-		jFrame.setSize(new Dimension(panelSnake.getSizeX() * 45, panelSnake.getSizeY() * 45));
+		jFrame.setSize(new Dimension(panelSnake.getSizeX() * 45, panelSnake.getSizeY() * 45 + 100));
 		Dimension windowSize = jFrame.getSize();
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Point centerPoint = ge.getCenterPoint();
@@ -47,6 +47,14 @@ public class ViewSnakeGame {
 		panelSnake.updateInfoGame(game.getFeaturesSnakes(), game.getFeaturesItems());
 		panelSnake.repaint();
 
+	}
+
+	public JFrame getjFrame() {
+		return jFrame;
+	}
+
+	public void setjFrame(JFrame jFrame) {
+		this.jFrame = jFrame;
 	}
 
 }
