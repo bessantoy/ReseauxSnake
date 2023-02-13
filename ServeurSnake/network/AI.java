@@ -1,20 +1,11 @@
 package network;
 
-public class AI implements Player {
-  private String username;
+public class AI extends Player {
   private String level;
 
   public AI(String username, String level) {
-    this.username = username;
+    super(username);
     this.level = level;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
   }
 
   public String getLevel() {

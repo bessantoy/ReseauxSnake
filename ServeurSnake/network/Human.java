@@ -1,15 +1,17 @@
 package network;
 
-import utils.AgentAction;
+import java.net.Socket;
 
-public class Human implements Player {
+import utils.AgentAction;
+import utils.HumanFeatures;
+
+public class Human extends Player {
   private Connection client;
-  private String username;
   AgentAction lastInput;
 
   public Human(Connection client, String username) {
+    super(username);
     this.client = client;
-    this.username = username;
     this.lastInput = AgentAction.MOVE_DOWN;
   }
 
@@ -21,16 +23,12 @@ public class Human implements Player {
     this.client = client;
   }
 
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
   public boolean isClient(Connection client) {
     return this.client.equals(client);
+  }
+
+  public boolean isClientFromSocket(Socket client) {
+    return this.client.getClient().equals(client);
   }
 
   public AgentAction getLastInput() {
@@ -39,6 +37,10 @@ public class Human implements Player {
 
   public void setLastInput(AgentAction lastInput) {
     this.lastInput = lastInput;
+  }
+
+  public HumanFeatures toHumanFeatures() {
+    return new HumanFeatures(getUsername(), client.getClient().getInetAddress());
   }
 
   @Override

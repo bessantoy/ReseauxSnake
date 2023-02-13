@@ -18,8 +18,6 @@ public class ServerListener extends Thread {
     try {
       while ((response = this.in.readLine()) != null) {
         this.network.handleServerSignal(response);
-        if (!response.startsWith("#"))
-          System.out.println(response);
       }
     } catch (IOException e) {
       e.printStackTrace();

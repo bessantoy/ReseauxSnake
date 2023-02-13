@@ -46,7 +46,7 @@ public class ViewCommand {
 
 		initChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
-				network.sendCommandSignal("RESTART");
+				network.sendViewCommandSignal("RESTART");
 				state.clickRestart();
 			}
 		});
@@ -54,21 +54,21 @@ public class ViewCommand {
 		//
 		pauseChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
-				network.sendCommandSignal("PAUSE");
+				network.sendViewCommandSignal("PAUSE");
 				state.clickPause();
 			}
 		});
 
 		playChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
-				network.sendCommandSignal("RESUME");
+				network.sendViewCommandSignal("RESUME");
 				state.clickPlay();
 			}
 		});
 
 		stepChoice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evenement) {
-				network.sendCommandSignal("STEP");
+				network.sendViewCommandSignal("STEP");
 				state.clickStep();
 			}
 		});
@@ -86,8 +86,8 @@ public class ViewCommand {
 				JSlider source = (JSlider) evenement.getSource();
 				if (!source.getValueIsAdjusting()) {
 					double speed = source.getValue();
-					network.sendCommandSignal("SPEED");
-					network.sendCommandSignal(String.valueOf(speed));
+					network.sendViewCommandSignal("SPEED");
+					network.sendViewCommandSignal(String.valueOf(speed));
 				}
 			}
 		});

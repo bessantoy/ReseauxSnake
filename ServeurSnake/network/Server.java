@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import controller.ControllerSnakeGame;
+import model.Lobby;
 
 import java.io.*;
 
 public class Server {
   private ServerSocket serverSocket;
   private ArrayList<Connection> clients;
-  private ArrayList<Human> players;
+  private Lobby lobby;
   private ControllerSnakeGame controller;
   private String levelAI = "Advanced";
 
@@ -20,7 +21,7 @@ public class Server {
       serverSocket = new ServerSocket(port);
       System.out.println("Starting server");
       clients = new ArrayList<>();
-      players = new ArrayList<>();
+      lobby = new Lobby(new ArrayList<>());
       while (true) {
         Connection connection = new Connection(serverSocket.accept(), this);
         clients.add(connection);
@@ -52,22 +53,22 @@ public class Server {
   }
 
   public void sendMessageToPlayers(String msg) {
-    for (Human player : players) {
+    for (Human player : lobby.getPlayers()) {
       player.getClient().sendDataToClient(msg);
     }
   }
 
   public boolean isInLobby(Connection client) {
-    for (int i = 0; i < this.players.size(); ++i) {
-      if (this.players.get(i).isClient(client))
+    for (int i = 0; i < this.lobby.getPlayers().size(); ++i) {
+      if (this.lobby.getPlayers().get(i).isClient(client))
         return true;
     }
     return false;
   }
 
-  public void sendLobbyInfoToPlayers() {
-    for (Human human : players) {
-      human.getClient().sendLobbyInfoToClient();
+  public void sendLobbyInfoToClients() {
+    for (Connection client : clients) {
+      client.sendLobbyInfoToClient();
     }
   }
 
@@ -76,7 +77,7 @@ public class Server {
   }
 
   public void loadGame() {
-    this.controller.setPlayers(players);
+    this.controller.setPlayers(lobby.getPlayers());
     this.controller.setLevelAI(levelAI);
   }
 
@@ -84,14 +85,14 @@ public class Server {
     return this.controller;
   }
 
-  public List<Human> getPlayers() {
-    return this.players;
+  public Lobby getLobby() {
+    return this.lobby;
   }
 
   public Human getPlayer(Connection client) {
-    for (int i = 0; i < this.getPlayers().size(); ++i) {
-      if (this.getPlayers().get(i).isClient(client))
-        return this.getPlayers().get(i);
+    for (int i = 0; i < this.lobby.getPlayers().size(); ++i) {
+      if (this.lobby.getPlayers().get(i).isClient(client))
+        return this.lobby.getPlayers().get(i);
     }
     return null;
   }

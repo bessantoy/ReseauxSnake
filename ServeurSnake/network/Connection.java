@@ -11,10 +11,12 @@ import com.google.gson.Gson;
 
 import controller.ControllerSnakeGame;
 import utils.AgentAction;
+import utils.GameFeatures;
 
 public class Connection extends Thread {
   private Server server;
   private Socket client;
+
   private PrintWriter out;
   private BufferedReader in;
 
@@ -31,9 +33,14 @@ public class Connection extends Thread {
     this.out.println("Server : " + msg);
   }
 
-  public String getUpdate() {
-    Gson gson = new Gson();
-    return gson.toJson(this.server.getController().getGameFeatures());
+  public void sendGameUpdate() {
+    if (this.server.isGameInitialised()) {
+      Gson gson = new Gson();
+      String update = gson.toJson(this.server.getController().getGameFeatures(), GameFeatures.class);
+      sendDataToClient("GAMEUPDATE#" + update);
+    } else {
+      this.sendInfoToClient("No game started");
+    }
   }
 
   public void run() {
@@ -46,11 +53,7 @@ public class Connection extends Thread {
       boolean connected = true;
       while (connected) {
         inputLine = in.readLine();
-        if (inputLine.startsWith("#")) {
-          this.handleCommand(inputLine);
-        } else {
-          connected = this.handleMessage(inputLine);
-        }
+        connected = this.handleCommand(inputLine);
       }
       in.close();
       out.close();
@@ -60,27 +63,22 @@ public class Connection extends Thread {
     }
   }
 
-  private void handleCommand(String inputLine) {
-    if (inputLine.startsWith("#VC#")) {
+  private boolean handleCommand(String inputLine) {
+    if (inputLine.startsWith("LBY#")) {
+      return handleLobbySignal(inputLine);
+    } else if (inputLine.startsWith("VC#")) {
       handleViewCommandSignals(inputLine);
-    } else if (inputLine.startsWith("#MV#")) {
+    } else if (inputLine.startsWith("MV#")) {
       handleMovementSignal(inputLine);
-    } else if (inputLine.startsWith("#UPDATE#")) {
+    } else if (inputLine.equals("GAMEUPDATE")) {
       System.out.println("Update view");
-      if (this.server.isGameInitialised()) {
-        sendDataToClient("#UPDATE#" + getUpdate());
-      } else {
-        this.sendInfoToClient("No game started");
-      }
-    } else if (inputLine.startsWith("#INIT#")) {
-      this.server.loadGame();
-      this.server.getController().initGame();
-      sendDataToClient("#INIT#" + getUpdate());
+      this.sendGameUpdate();
     }
+    return true;
   }
 
   private void handleViewCommandSignals(String signal) {
-    signal = signal.substring(4);
+    signal = signal.substring(3);
     System.out.println("Signal received : " + signal);
     if (this.server.isGameInitialised()) {
       switch (signal) {
@@ -88,15 +86,15 @@ public class Connection extends Thread {
           this.server.getController().pause();
           break;
         case "RESUME":
-          this.server.sendMessageToPlayers("#RESUME#");
+          this.server.sendMessageToPlayers("RESUME");
           this.server.getController().play();
           break;
         case "STEP":
           this.server.getController().step();
-          this.server.sendMessageToPlayers("#STEP#");
+          this.server.sendMessageToPlayers("STEP");
           break;
         case "RESTART":
-          this.server.sendMessageToPlayers("#RESTART#");
+          this.server.sendMessageToPlayers("RESTART");
           this.server.getController().restart();
           break;
         case "SPEED":
@@ -118,7 +116,7 @@ public class Connection extends Thread {
   }
 
   private void handleMovementSignal(String signal) {
-    signal = signal.substring(4);
+    signal = signal.substring(3);
     System.out.println("Signal received : " + signal);
     switch (signal) {
       case "UP":
@@ -138,46 +136,43 @@ public class Connection extends Thread {
     }
   }
 
-  private boolean handleMessage(String inputLine) {
-    if (inputLine.equals("init")) {
+  private boolean handleLobbySignal(String signal) {
+    signal = signal.substring(4);
+    if (signal.equals("INIT")) {
       initGame("arena");
-    } else if (inputLine.startsWith("init ")) {
-      String layout = inputLine.substring(5);
+    } else if (signal.startsWith("INIT#")) {
+      String layout = signal.substring(5);
       initGame(layout);
-    } else if (inputLine.equals("join")) {
-      joinLobby("Anonym");
-    } else if (inputLine.startsWith("join ")) {
-      String name = inputLine.substring(5);
-      joinLobby(name);
-    } else if (inputLine.equals("launch")) {
+    } else if (signal.startsWith("UPDATE")) {
+      this.sendLobbyInfoToClient();
+    } else if (signal.startsWith("JOIN#")) {
+      joinLobby(signal);
+    } else if (signal.equals("LAUNCH")) {
       this.handleLaunch();
-    } else if (inputLine.equals("ijl")) {
+    } else if (signal.equals("ijl")) {
       initGame("arena");
       joinLobby("Anonym");
       this.handleLaunch();
-    } else if (inputLine.equals("leave lobby")) {
-      this.server.getPlayers().remove(this.server.getPlayer(this));
-      this.sendInfoToClient("You left the lobby");
-      this.server.sendLobbyInfoToPlayers();
-    } else if (inputLine.equals("reset lobby")) {
-      this.server.getPlayers().clear();
-    } else if (inputLine.startsWith("level ")) {
-      handleLevelChange(inputLine);
-    } else if (inputLine.equals("lobby")) {
-      this.sendLobbyInfoToClient();
-    } else if (inputLine.equals("exit")) {
+    } else if (signal.equals("LEAVE")) {
+      this.handleLeaveLobby();
+    } else if (signal.equals("reset lobby")) {
+      this.server.getLobby().clear();
+    } else if (signal.startsWith("level ")) {
+      handleLevelChange(signal);
+    } else if (signal.equals("EXIT")) {
       this.handleClientExit();
       return false;
     } else {
-      this.sendInfoToClient("Unknown command : " + inputLine);
+      this.sendInfoToClient("Unknown command : " + signal);
     }
     return true;
   }
 
   private void handleLaunch() {
     if (this.server.isGameInitialised()) {
-      if (!this.server.getPlayers().isEmpty()) {
-        this.server.sendMessageToPlayers("#LAUNCH#");
+      if (!this.server.getLobby().isEmpty()) {
+        this.server.getController().initGame();
+        this.server.sendMessageToPlayers("LAUNCH");
       } else {
         this.sendInfoToClient("Not enough players");
       }
@@ -188,7 +183,7 @@ public class Connection extends Thread {
 
   private void handleClientExit() {
     this.server.getClients().remove(this);
-    this.server.getPlayers().remove(this.server.getPlayer(this));
+    this.server.getLobby().removePlayer(this.server.getPlayer(this));
     System.out.println("Client disconnected");
     this.server.sendInfoToClients("Client disconnected");
   }
@@ -196,11 +191,12 @@ public class Connection extends Thread {
   private void initGame(String layout) {
     if (new File("./layouts/" + layout + ".lay").exists()) {
       this.server.setController(new ControllerSnakeGame(layout));
+      this.server.loadGame();
       System.out.println("Game started with layout : " + layout);
       this.server.sendInfoToClients("Game initialised with layout : " + layout);
-      if (this.server.getController().getNumberOfPlayers() < this.server.getPlayers()
+      if (this.server.getController().getNumberOfPlayers() < this.server.getLobby().getPlayers()
           .size()) {
-        this.server.getPlayers().clear();
+        this.server.getLobby().getPlayers().clear();
         this.server.sendDataToClients("Lobby reseted, please join again");
       }
     } else {
@@ -208,14 +204,15 @@ public class Connection extends Thread {
     }
   }
 
-  private void joinLobby(String name) {
+  private void joinLobby(String signal) {
+    String name = signal.substring(5);
     if (this.server.isGameInitialised()) {
       if (!this.server.isInLobby(this)) {
-        if (this.server.getController().getNumberOfPlayers() >= this.server.getPlayers()
-            .size()) {
-          this.server.getPlayers().add(new Human(this, name));
+        if (this.server.getController().getNumberOfPlayers() >= this.server.getLobby().getPlayers().size()) {
+          this.server.getLobby().addPlayer(new Human(this, name));
+          System.out.println("Player " + name + " joined the lobby");
           this.sendInfoToClient("You joined the lobby");
-          this.server.sendLobbyInfoToPlayers();
+          this.server.sendLobbyInfoToClients();
         } else {
           this.sendDataToClient("Game is full");
         }
@@ -227,9 +224,24 @@ public class Connection extends Thread {
     }
   }
 
+  private void handleLeaveLobby() {
+    if (this.server.isInLobby(this)) {
+      this.server.getLobby().removePlayer(this.server.getPlayer(this));
+      System.out.println("Player left the lobby");
+      this.sendInfoToClient("You left the lobby");
+      this.server.sendLobbyInfoToClients();
+    } else {
+      this.sendInfoToClient("You are not in the lobby");
+    }
+  }
+
   public void sendLobbyInfoToClient() {
     Gson gson = new Gson();
-    this.sendDataToClient("#LOBBY#" + gson.toJson(this.server.getPlayers()));
+    if (this.server.getLobby() == null) {
+      this.sendDataToClient("LBYUPDATE#NULL");
+    } else {
+      this.sendDataToClient("LBYUPDATE#" + gson.toJson(this.server.getLobby().toLobbyFeatures()));
+    }
   }
 
   private void handleLevelChange(String inputLine) {
@@ -252,5 +264,9 @@ public class Connection extends Thread {
     } catch (NumberFormatException e) {
       this.sendInfoToClient(inputLine + "is not a difficulty (1-2)");
     }
+  }
+
+  public Socket getClient() {
+    return client;
   }
 }

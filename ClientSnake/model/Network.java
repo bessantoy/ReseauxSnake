@@ -5,15 +5,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 import com.google.gson.Gson;
 
-import network.Human;
 import utils.AgentAction;
 import utils.GameFeatures;
 import utils.GameState;
+import utils.LobbyFeatures;
 import view.PanelSnakeGame;
 import view.ViewClient;
 import view.ViewCommand;
@@ -23,6 +21,7 @@ public class Network extends Thread {
 
   private AgentAction inputMoveHuman;
   private GameFeatures gameFeatures;
+  private LobbyFeatures lobbyFeatures;
   private Socket clientSocket;
   private PrintWriter out;
   private BufferedReader in;
@@ -37,16 +36,19 @@ public class Network extends Thread {
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       System.out.println("Connected to server");
       new ServerListener(this, in).start();
-      this.viewClient = new ViewClient(this);
-      this.stopConnection();
+      this.initClientView();
     } catch (IOException e) {
       e.printStackTrace();
     }
-
   }
 
-  private void stopConnection() {
+  private void initClientView() {
+    sendLobbySignal("UPDATE");
+  }
+
+  public void stopConnection() {
     try {
+      sendLobbySignal("EXIT");
       in.close();
       out.close();
       clientSocket.close();
@@ -69,31 +71,22 @@ public class Network extends Thread {
 
   private void updateView() {
     System.out.println("Update view");
-    this.out.println("#UPDATE#");
+    this.out.println("GAMEUPDATE");
   }
 
-  private void initView() {
-    this.out.println("#INIT#");
-  }
-
-  public void handleServerSignal(String response) {
-    if (response.equals("#RESTART#")) {
+  public void handleServerSignal(String signal) {
+    if (signal.equals("RESTART")) {
       this.updateView();
-    } else if (response.equals("#RESUME#")) {
+    } else if (signal.equals("RESUME")) {
       this.play();
-    } else if (response.equals("#STEP#")) {
+    } else if (signal.equals("STEP")) {
       this.updateView();
-    } else if (response.equals("#LAUNCH#")) {
-      initView();
-    } else if (response.startsWith("#UPDATE#")) {
-      response = response.substring(8);
-      this.handleUpdate(response);
-    } else if (response.startsWith("#INIT#")) {
-      response = response.substring(6);
-      this.handleInit(response);
-    } else if (response.startsWith("#LOBBY#")) {
-      response = response.substring(7);
-      this.handleLobby(response);
+    } else if (signal.equals("LAUNCH")) {
+      updateView();
+    } else if (signal.startsWith("GAMEUPDATE#")) {
+      this.handleGameUpdate(signal);
+    } else if (signal.startsWith("LBYUPDATE#")) {
+      this.handleLobbyUpdate(signal);
     }
   }
 
@@ -110,6 +103,10 @@ public class Network extends Thread {
     return gameFeatures;
   }
 
+  public LobbyFeatures getLobbyFeatures() {
+    return lobbyFeatures;
+  }
+
   public void setInputMoveHuman(AgentAction inputMoveHuman) {
     this.inputMoveHuman = inputMoveHuman;
   }
@@ -118,48 +115,57 @@ public class Network extends Thread {
     this.gameFeatures = gameFeatures;
   }
 
-  public void handleUpdate(String response) {
-    if (!response.equals("-1")) {
-      this.readGameFeatures(response);
-      this.viewSnakeGame.update(this.gameFeatures);
-      this.viewCommand.update(this.gameFeatures);
-      if (this.gameFeatures.getState() == GameState.PLAYING)
-        this.play();
+  public void handleGameUpdate(String signal) {
+    signal = signal.substring(11);
+    if (!signal.equals("-1")) {
+      this.readGameFeatures(signal);
+      if (this.viewSnakeGame == null) {
+        this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
+            this.getGameFeatures().getSizeX(),
+            this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
+            this.getGameFeatures().getFeaturesSnakes(),
+            this.getGameFeatures().getFeaturesItems()), this);
+        this.viewCommand = new ViewCommand(this, this.viewSnakeGame.getjFrame());
+        play();
+      } else {
+        this.viewSnakeGame.update(this.gameFeatures);
+        this.viewCommand.update(this.gameFeatures);
+        if (this.gameFeatures.getState() == GameState.PLAYING)
+          this.play();
+      }
     }
   }
 
-  public void handleInit(String response) {
-    if (!response.equals("-1")) {
-      this.readGameFeatures(response);
-      this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
-          this.getGameFeatures().getSizeX(),
-          this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
-          this.getGameFeatures().getFeaturesSnakes(),
-          this.getGameFeatures().getFeaturesItems()), this);
-      this.viewCommand = new ViewCommand(this, this.viewSnakeGame.getjFrame());
-      play();
+  public void handleLobbyUpdate(String signal) {
+    signal = signal.substring(10);
+    if (!signal.equals("NULL")) {
+      Gson gson = new Gson();
+      this.lobbyFeatures = gson.fromJson(signal, LobbyFeatures.class);
+      if (this.viewClient == null) {
+        this.viewClient = new ViewClient(this, clientSocket.getInetAddress());
+      } else {
+        this.viewClient.update(lobbyFeatures, clientSocket.getInetAddress());
+      }
+    } else {
+      System.out.println("Server couldn't send lobby infos");
     }
-  }
-
-  public void handleLobby(String response) {
-    Gson gson = new Gson();
-    ArrayList<Human> lobby = gson.fromJson(response, ArrayList.class);
-    this.viewClient.update(lobby);
   }
 
   public void readGameFeatures(String json) {
     Gson gson = new Gson();
     this.gameFeatures = gson.fromJson(json, GameFeatures.class);
-    if (this.gameFeatures == null) {
-      System.out.println("Error: gameFeatures is null");
-    }
+
   }
 
-  public void sendCommandSignal(String signal) {
-    this.out.println("#VC#" + signal);
+  public void sendViewCommandSignal(String signal) {
+    this.out.println("VC#" + signal);
+  }
+
+  public void sendLobbySignal(String signal) {
+    this.out.println("LBY#" + signal);
   }
 
   public void sendMovementSignal(String signal) {
-    this.out.println("#MV#" + signal);
+    this.out.println("MV#" + signal);
   }
 }
