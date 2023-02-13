@@ -5,14 +5,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.google.gson.Gson;
 
+import network.Human;
 import utils.AgentAction;
 import utils.GameFeatures;
 import utils.GameState;
 import view.PanelSnakeGame;
+import view.ViewClient;
 import view.ViewCommand;
 import view.ViewSnakeGame;
 
@@ -23,6 +26,7 @@ public class Network extends Thread {
   private Socket clientSocket;
   private PrintWriter out;
   private BufferedReader in;
+  private ViewClient viewClient;
   private ViewCommand viewCommand;
   private ViewSnakeGame viewSnakeGame;
 
@@ -33,13 +37,7 @@ public class Network extends Thread {
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       System.out.println("Connected to server");
       new ServerListener(this, in).start();
-      Scanner scan = new Scanner(System.in);
-      String input;
-      while (!(input = scan.nextLine()).equals("exit")) {
-        this.out.println(input);
-      }
-      this.out.println(input);
-      scan.close();
+      this.viewClient = new ViewClient(this);
       this.stopConnection();
     } catch (IOException e) {
       e.printStackTrace();
@@ -93,6 +91,9 @@ public class Network extends Thread {
     } else if (response.startsWith("#INIT#")) {
       response = response.substring(6);
       this.handleInit(response);
+    } else if (response.startsWith("#LOBBY#")) {
+      response = response.substring(7);
+      this.handleLobby(response);
     }
   }
 
@@ -138,6 +139,12 @@ public class Network extends Thread {
       this.viewCommand = new ViewCommand(this, this.viewSnakeGame.getjFrame());
       play();
     }
+  }
+
+  public void handleLobby(String response) {
+    Gson gson = new Gson();
+    ArrayList<Human> lobby = gson.fromJson(response, ArrayList.class);
+    this.viewClient.update(lobby);
   }
 
   public void readGameFeatures(String json) {

@@ -228,21 +228,8 @@ public class Connection extends Thread {
   }
 
   public void sendLobbyInfoToClient() {
-    this.sendInfoToClient("Lobby Infos : ");
-    if (this.server.isGameInitialised()) {
-      if (!this.server.getPlayers().isEmpty()) {
-        for (int i = 0; i < this.server.getPlayers().size(); ++i) {
-          if (this.server.getPlayers().get(i).getClient() == this)
-            this.sendDataToClient("    " + this.server.getPlayers().get(i).getUsername() + " (you)");
-          else
-            this.sendDataToClient("    " + this.server.getPlayers().get(i).getUsername());
-        }
-      } else {
-        this.sendDataToClient("Lobby is empty");
-      }
-    } else {
-      this.sendDataToClient("No game started");
-    }
+    Gson gson = new Gson();
+    this.sendDataToClient("#LOBBY#" + gson.toJson(this.server.getPlayers()));
   }
 
   private void handleLevelChange(String inputLine) {
