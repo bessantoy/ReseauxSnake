@@ -79,6 +79,7 @@ public class ViewCommand {
 		j.setMajorTickSpacing(1);
 		j.setPaintTicks(true);
 		j.setPaintLabels(true);
+		j.setFocusable(false);
 
 		j.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evenement) {
