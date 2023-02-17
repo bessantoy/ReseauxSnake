@@ -28,6 +28,7 @@ public class Network extends Thread {
   private Socket clientSocket;
   private PrintWriter out;
   private BufferedReader in;
+  private int id;
   private ViewClient viewClient;
   private ViewCommand viewCommand;
   private ViewSnakeGame viewSnakeGame;
@@ -39,13 +40,13 @@ public class Network extends Thread {
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       System.out.println("Connected to server");
       new ServerListener(this, in).start();
-      this.initClientView();
+      this.updateClientView();
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  private void initClientView() {
+  private void updateClientView() {
     sendLobbySignal("UPDATE");
   }
 
@@ -79,7 +80,9 @@ public class Network extends Thread {
   }
 
   public void handleServerSignal(String signal) {
-    if (signal.equals("RESTART")) {
+    if (signal.startsWith("CONNECTION#")) {
+      this.handleInitConnection(signal);
+    } else if (signal.equals("RESTART")) {
       this.updateView();
     } else if (signal.equals("RESUME")) {
       this.updateView();
@@ -91,7 +94,10 @@ public class Network extends Thread {
       this.handleGameUpdate(signal);
     } else if (signal.startsWith("LBYUPDATE#")) {
       this.handleLobbyUpdate(signal);
+    } else if (signal.startsWith("INITIALISED#")) {
+      this.handleGameInitalised(signal);
     }
+
   }
 
   public Network() {
@@ -117,6 +123,11 @@ public class Network extends Thread {
 
   public void setGameFeatures(GameFeatures gameFeatures) {
     this.gameFeatures = gameFeatures;
+  }
+
+  public void handleInitConnection(String signal) {
+    signal = signal.substring(11);
+    this.id = Integer.parseInt(signal);
   }
 
   public void handleGameUpdate(String signal) {
@@ -146,13 +157,19 @@ public class Network extends Thread {
       Gson gson = new Gson();
       this.lobbyFeatures = gson.fromJson(signal, LobbyFeatures.class);
       if (this.viewClient == null) {
-        this.viewClient = new ViewClient(this, clientSocket.getInetAddress());
+        this.viewClient = new ViewClient(this, id);
       } else {
-        this.viewClient.update(lobbyFeatures, clientSocket.getInetAddress());
+        this.viewClient.update(lobbyFeatures, id);
       }
     } else {
       System.out.println("Server couldn't send lobby infos");
     }
+  }
+
+  public void handleGameInitalised(String signal) {
+    signal = signal.substring(12);
+    this.lobbyFeatures.setMap(signal);
+    this.viewClient.update(lobbyFeatures, id);
   }
 
   public void readGameFeatures(String json) {

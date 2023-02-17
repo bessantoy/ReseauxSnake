@@ -16,13 +16,15 @@ import utils.GameFeatures;
 public class Connection extends Thread {
   private Server server;
   private Socket client;
+  private int id;
 
   private PrintWriter out;
   private BufferedReader in;
 
-  public Connection(Socket socket, Server server) {
+  public Connection(Socket socket, Server server, int id) {
     this.client = socket;
     this.server = server;
+    this.id = id;
   }
 
   public void sendDataToClient(String msg) {
@@ -48,9 +50,9 @@ public class Connection extends Thread {
       out = new PrintWriter(client.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(client.getInputStream()));
       System.out.println("new client connected");
-
-      String inputLine;
+      out.println("CONNECTION#" + id);
       boolean connected = true;
+      String inputLine;
       while (connected) {
         inputLine = in.readLine();
         connected = this.handleCommand(inputLine);
@@ -183,8 +185,7 @@ public class Connection extends Thread {
   }
 
   private void handleClientExit() {
-    this.server.getClients().remove(this);
-    this.server.getLobby().removePlayer(this.server.getPlayer(this));
+    this.server.removeClient(this);
     System.out.println("Client disconnected");
     this.server.sendInfoToClients("Client disconnected");
   }
@@ -194,7 +195,7 @@ public class Connection extends Thread {
       this.server.setController(new ControllerSnakeGame(layout));
       this.server.loadGame();
       System.out.println("Game started with layout : " + layout);
-      this.server.sendInfoToClients("Game initialised with layout : " + layout);
+      this.server.sendDataToClients("INITIALISED#" + layout);
       if (this.server.getController().getNumberOfPlayers() < this.server.getLobby().getPlayers()
           .size()) {
         this.server.getLobby().getPlayers().clear();
@@ -210,7 +211,7 @@ public class Connection extends Thread {
     if (this.server.isGameInitialised()) {
       if (!this.server.isInLobby(this)) {
         if (this.server.getController().getNumberOfPlayers() >= this.server.getLobby().getPlayers().size()) {
-          this.server.getLobby().addPlayer(new Human(this, name));
+          this.server.getLobby().addPlayer(new Human(this, id, name));
           System.out.println("Player " + name + " joined the lobby");
           this.sendInfoToClient("You joined the lobby");
           this.server.sendLobbyInfoToClients();
@@ -269,5 +270,9 @@ public class Connection extends Thread {
 
   public Socket getClient() {
     return client;
+  }
+
+  public int getClientId() {
+    return id;
   }
 }

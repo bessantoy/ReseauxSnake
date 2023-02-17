@@ -12,6 +12,7 @@ import java.io.*;
 public class Server {
   private ServerSocket serverSocket;
   private ArrayList<Connection> clients;
+  private int idGenerator = 0;
   private Lobby lobby;
   private ControllerSnakeGame controller;
   private String levelAI = "Advanced";
@@ -21,9 +22,13 @@ public class Server {
       serverSocket = new ServerSocket(port);
       System.out.println("Starting server");
       clients = new ArrayList<>();
-      lobby = new Lobby(new ArrayList<>());
+      if (this.isGameInitialised()) {
+        lobby = new Lobby(new ArrayList<>(), this.controller.getGame().getLayout());
+      } else {
+        lobby = new Lobby(new ArrayList<>(), null);
+      }
       while (true) {
-        Connection connection = new Connection(serverSocket.accept(), this);
+        Connection connection = new Connection(serverSocket.accept(), this, idGenerator++);
         clients.add(connection);
         connection.start();
       }
@@ -79,6 +84,7 @@ public class Server {
   public void loadGame() {
     this.controller.setPlayers(lobby.getPlayers());
     this.controller.setLevelAI(levelAI);
+    this.lobby.setMap(this.controller.getInputMap().getFilename());
   }
 
   public ControllerSnakeGame getController() {
@@ -99,6 +105,15 @@ public class Server {
 
   public List<Connection> getClients() {
     return this.clients;
+  }
+
+  public void removeClient(Connection client) {
+    clients.remove(client);
+    lobby.removePlayer(getPlayer(client));
+    if (clients.isEmpty()) {
+      this.controller = null;
+      this.lobby.setMap(null);
+    }
   }
 
   public void setController(ControllerSnakeGame controller) {
