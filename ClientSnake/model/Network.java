@@ -91,6 +91,8 @@ public class Network extends Thread {
       this.handleGameUpdate(signal);
     } else if (signal.startsWith("LBYUPDATE#")) {
       this.handleLobbyUpdate(signal);
+    } else if (signal.equals("SPEED CHANGED")) {
+      this.updateView();
     }
   }
 

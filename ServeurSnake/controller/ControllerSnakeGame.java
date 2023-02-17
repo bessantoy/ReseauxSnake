@@ -63,4 +63,8 @@ public class ControllerSnakeGame extends AbstractController {
 		}
 	}
 
+	public double getSpeed(){
+		return this.game.getTime();
+	}
+
 }

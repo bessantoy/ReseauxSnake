@@ -25,6 +25,8 @@ public class ViewCommand {
 	JButton playChoice;
 	JButton stepChoice;
 
+	JSlider j;
+
 	public ViewCommand(Network network, JFrame mainFrame) {
 
 		this.network = network;
@@ -73,7 +75,7 @@ public class ViewCommand {
 			}
 		});
 
-		JSlider j = new JSlider(1, 10);
+		this.j = new JSlider(1, 10);
 
 		j.setValue((int) network.getGameFeatures().getSpeed() / 1000);
 		j.setMajorTickSpacing(1);
@@ -85,6 +87,7 @@ public class ViewCommand {
 			public void stateChanged(ChangeEvent evenement) {
 				JSlider source = (JSlider) evenement.getSource();
 				if (!source.getValueIsAdjusting()) {
+					
 					double speed = source.getValue();
 					network.sendViewCommandSignal("SPEED");
 					network.sendViewCommandSignal(String.valueOf(speed));
@@ -143,6 +146,13 @@ public class ViewCommand {
 			break;
 			
 		}
+
+		if(this.j.getValue()!=1000 /(int) network.getGameFeatures().getSpeed()){
+			this.j.setValue(1000 /(int) network.getGameFeatures().getSpeed());
+			this.j.setValueIsAdjusting(false);
+		}
+
+		
 		  
 
 	}
