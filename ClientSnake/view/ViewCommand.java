@@ -27,6 +27,8 @@ public class ViewCommand {
 
 	JSlider j;
 
+	private boolean userChangeValue = true;
+
 	public ViewCommand(Network network, JFrame mainFrame) {
 
 		this.network = network;
@@ -86,9 +88,10 @@ public class ViewCommand {
 		j.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent evenement) {
 				JSlider source = (JSlider) evenement.getSource();
-				if (!source.getValueIsAdjusting()) {
-					
+				if (!source.getValueIsAdjusting() && userChangeValue) {
+					System.out.println("changed");
 					double speed = source.getValue();
+					System.out.println(source.getValue());
 					network.sendViewCommandSignal("SPEED");
 					network.sendViewCommandSignal(String.valueOf(speed));
 				}
@@ -131,30 +134,29 @@ public class ViewCommand {
 	public void update(GameFeatures game) {
 
 		jtext.setText("Tour :" + game.getTurn());
-		switch(game.getState()){
-			case PLAYING: 
-			this.setState(new StateRunning(this)); 
-			break;
-			case PAUSED: 
-			this.setState(new StateWaiting(this));
-			break;
+		switch (game.getState()) {
+			case PLAYING:
+				this.setState(new StateRunning(this));
+				break;
+			case PAUSED:
+				this.setState(new StateWaiting(this));
+				break;
 			case OVER:
-			this.setState(new StateWaiting(this));
-			break;
+				this.setState(new StateWaiting(this));
+				break;
 			case STARTING:
-				this.setState(new StateStarting(this)); 
-			break;
-			
+				this.setState(new StateStarting(this));
+				break;
+
 		}
+	}
 
-		if(this.j.getValue()!=1000 /(int) network.getGameFeatures().getSpeed()){
-			this.j.setValue(1000 /(int) network.getGameFeatures().getSpeed());
-			this.j.setValueIsAdjusting(false);
+	public void updateSlider(Double speed) {
+		if (this.j.getValue() != speed.intValue()) {
+			userChangeValue = false;
+			this.j.setValue(speed.intValue());
+			userChangeValue = true;
 		}
-
-		
-		  
-
 	}
 
 }

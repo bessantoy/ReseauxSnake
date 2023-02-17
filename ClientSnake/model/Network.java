@@ -70,11 +70,11 @@ public class Network extends Thread {
       e.printStackTrace();
       this.interrupt();
     }
-    this.updateView();
+    this.askForViewUpdate();
 
   }
 
-  private void updateView() {
+  private void askForViewUpdate() {
     System.out.println("Update view");
     this.out.println("GAMEUPDATE");
   }
@@ -83,19 +83,19 @@ public class Network extends Thread {
     if (signal.startsWith("CONNECTION#")) {
       this.handleInitConnection(signal);
     } else if (signal.equals("RESTART")) {
-      this.updateView();
+      this.askForViewUpdate();
     } else if (signal.equals("RESUME")) {
-      this.updateView();
+      this.askForViewUpdate();
     } else if (signal.equals("STEP")) {
-      this.updateView();
+      this.askForViewUpdate();
     } else if (signal.equals("LAUNCH")) {
-      updateView();
+      askForViewUpdate();
     } else if (signal.startsWith("GAMEUPDATE#")) {
       this.handleGameUpdate(signal);
     } else if (signal.startsWith("LBYUPDATE#")) {
       this.handleLobbyUpdate(signal);
-    } else if (signal.equals("SPEED CHANGED")) {
-      this.updateView();
+    } else if (signal.startsWith("SPEED#")) {
+      this.handleSpeedChange(signal);
     } else if (signal.startsWith("INITIALISED#")) {
       this.handleGameInitalised(signal);
     }
@@ -151,6 +151,12 @@ public class Network extends Thread {
           this.play();
       }
     }
+  }
+
+  public void handleSpeedChange(String signal) {
+    signal = signal.substring(6);
+    System.out.println(signal);
+    viewCommand.updateSlider(Double.parseDouble(signal));
   }
 
   public void handleLobbyUpdate(String signal) {

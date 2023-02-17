@@ -104,9 +104,10 @@ public class Connection extends Thread {
           try {
             String response = in.readLine();
             response = response.substring(3);
-            if(this.server.getController().getSpeed()!=Double.parseDouble(response)){
-              this.server.getController().setSpeed(Double.parseDouble(response));
-              this.server.sendMessageToPlayers("SPEED CHANGED");
+            Double speed = Double.parseDouble(response);
+            if (this.server.getController().getSpeed() != speed) {
+              this.server.getController().setSpeed(speed);
+              this.server.sendMessageToPlayers("SPEED#" + speed.toString());
             }
           } catch (IOException e) {
             e.printStackTrace();
