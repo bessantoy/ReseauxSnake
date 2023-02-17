@@ -445,3 +445,11 @@ public class SnakeGame extends Game {
 	}
 
 }
+
+/*
+ * Ajouter un attribut score à chaque snake,
+ * mettre cette info dans snake features pour pouvoir afficher le score dans le
+ * view command ,
+ * système de score simple : 10 points par tour, 50 points par pommes mangées et
+ * 100 points pour avoir tué un autre joueur
+ */
