@@ -2,15 +2,18 @@ package model;
 
 import java.util.ArrayList;
 
+import network.Connection;
 import network.Human;
 import utils.HumanFeatures;
 import utils.LobbyFeatures;
 
 public class Lobby {
   private ArrayList<Human> players;
+  private String map;
 
-  public Lobby(ArrayList<Human> players) {
+  public Lobby(ArrayList<Human> players, String map) {
     this.players = players;
+    this.map = map;
   }
 
   public boolean isEmpty() {
@@ -38,7 +41,19 @@ public class Lobby {
     for (Human human : players) {
       humanFeatures.add(human.toHumanFeatures());
     }
-    return new LobbyFeatures(humanFeatures);
+    return new LobbyFeatures(humanFeatures, map);
+  }
+
+  public String getMap() {
+    return this.map;
+  }
+
+  public boolean isGameInitialised() {
+    return map != null;
+  }
+
+  public void setMap(String map) {
+    this.map = map;
   }
 
 }

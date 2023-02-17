@@ -3,10 +3,10 @@ package view;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.BoxLayout;
 import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 
@@ -36,7 +36,7 @@ public class ViewClient extends JFrame {
   private JButton exit;
   private JComboBox<String> layout;
 
-  public ViewClient(Network network, InetAddress clientAdress) {
+  public ViewClient(Network network, int id) {
     this.network = network;
     setTitle("Client Snake");
     setSize(500, 500);
@@ -82,15 +82,7 @@ public class ViewClient extends JFrame {
     joinLobby = new JButton();
     joinLobby.setText("Join Lobby");
 
-    joinLobby.addActionListener(e -> {
-      if (joinLobby.getText().equals("Leave Lobby")) {
-        network.sendLobbySignal("LEAVE");
-        joinLobby.setText("Join Lobby");
-      } else {
-        network.sendLobbySignal("JOIN#" + name.getText());
-        joinLobby.setText("Leave Lobby");
-      }
-    });
+    joinLobby.addActionListener(e -> network.sendLobbySignal("JOIN#" + name.getText()));
 
     name = new JTextField();
     name.setFont(new java.awt.Font("Arial", 1, 20));
@@ -121,7 +113,7 @@ public class ViewClient extends JFrame {
     add("top", panelTop);
     add("middle", panelMiddle);
 
-    update(network.getLobbyFeatures(), clientAdress);
+    update(network.getLobbyFeatures(), id);
 
     setVisible(true);
 
@@ -133,7 +125,12 @@ public class ViewClient extends JFrame {
     System.exit(0);
   }
 
-  public void update(LobbyFeatures lobby, InetAddress clientAdress) {
+  public void update(LobbyFeatures lobby, int id) {
+    handleLobbyUpdate(lobby, id);
+    handleButtonsUpdate(lobby, id);
+  }
+
+  private void handleLobbyUpdate(LobbyFeatures lobby, int id) {
     String lobbyString = "Lobby Info : ";
     if (lobby.getPlayers().isEmpty()) {
       lobbyString += "Lobby empty";
@@ -141,13 +138,42 @@ public class ViewClient extends JFrame {
       lobbyString += "\n";
       for (HumanFeatures humanFeatures : lobby.getPlayers()) {
         lobbyString += "    " + humanFeatures.getUsername();
-        if (humanFeatures.getClientAdress().equals(clientAdress)) {
+        if (humanFeatures.getId() == id) {
           lobbyString += " (you)";
         }
         lobbyString += "\n";
       }
     }
     lobbyLabel.setText(lobbyString);
+  }
+
+  private void handleButtonsUpdate(LobbyFeatures lobby, int id) {
+    if (!lobby.isGameInitialised()) {
+      launchGame.setEnabled(false);
+      joinLobby.setEnabled(false);
+      initGame.setText("Init Game");
+    } else {
+      initGame.setText("Reset Game");
+      layout.setSelectedItem(lobby.getMap());
+      joinLobby.setEnabled(true);
+      if (lobby.isClientInLobby(id)) {
+        removeActionListeners(joinLobby);
+        joinLobby.addActionListener(e -> network.sendLobbySignal("LEAVE"));
+        joinLobby.setText("Leave Lobby");
+        launchGame.setEnabled(true);
+      } else {
+        removeActionListeners(joinLobby);
+        joinLobby.addActionListener(e -> network.sendLobbySignal("JOIN#" + name.getText()));
+        joinLobby.setText("Join Lobby");
+        launchGame.setEnabled(false);
+      }
+    }
+  }
+
+  private void removeActionListeners(JButton button) {
+    for (int i = 0; i < button.getActionListeners().length; i++) {
+      button.removeActionListener(button.getActionListeners()[i]);
+    }
   }
 
 }

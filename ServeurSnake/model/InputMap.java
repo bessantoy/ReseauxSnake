@@ -34,8 +34,11 @@ public class InputMap implements Serializable {
 
 	public InputMap(String filename) throws Exception {
 
-		this.filename = filename;
+		this.filename = "layouts/" + filename + ".lay";
+		initMap();
+	}
 
+	private void initMap() {
 		try {
 
 			InputStream flux = new FileInputStream(filename);
@@ -126,7 +129,6 @@ public class InputMap implements Serializable {
 		} catch (Exception e) {
 			System.out.println("Erreur : " + e.getMessage());
 		}
-
 	}
 
 	public int getSizeX() {

@@ -13,11 +13,12 @@ public class ControllerSnakeGame extends AbstractController {
 	SnakeGame snakeGame;
 	List<Human> players;
 	InputMap inputMap = null;
+
 	String levelAI;
 
 	public ControllerSnakeGame(String layoutName) {
 		try {
-			this.inputMap = new InputMap("layouts/" + layoutName + ".lay");
+			this.inputMap = new InputMap(layoutName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -41,6 +42,10 @@ public class ControllerSnakeGame extends AbstractController {
 
 	public List<Human> getPlayers() {
 		return players;
+	}
+
+	public InputMap getInputMap() {
+		return inputMap;
 	}
 
 	public void setPlayers(List<Human> players) {
