@@ -55,7 +55,11 @@ public class Connection extends Thread {
       String inputLine;
       while (connected) {
         inputLine = in.readLine();
-        connected = this.handleCommand(inputLine);
+        if (inputLine == null) {
+          connected = false;
+        } else {
+          connected = this.handleCommand(inputLine);
+        }
       }
       in.close();
       out.close();
