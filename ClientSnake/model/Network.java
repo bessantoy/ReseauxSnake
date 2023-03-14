@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.Socket;
 
 import com.google.gson.Gson;
@@ -14,9 +15,6 @@ import utils.GameState;
 import utils.LobbyFeatures;
 import view.PanelSnakeGame;
 import view.ViewClient;
-import view.StateRunning;
-import view.StateStarting;
-import view.StateWaiting;
 import view.ViewCommand;
 import view.ViewSnakeGame;
 
@@ -41,6 +39,8 @@ public class Network extends Thread {
       System.out.println("Connected to server");
       new ServerListener(this, in).start();
       this.updateClientView();
+    } catch (ConnectException e) {
+      System.out.println("Server is not running");
     } catch (IOException e) {
       e.printStackTrace();
     }

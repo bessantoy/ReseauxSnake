@@ -57,7 +57,13 @@ public class Server {
     }
   }
 
-  public void sendMessageToPlayers(String msg) {
+  public void sendInfoToPlayers(String msg) {
+    for (Human player : lobby.getPlayers()) {
+      player.getClient().sendInfoToClient(msg);
+    }
+  }
+
+  public void sendDataToPlayers(String msg) {
     for (Human player : lobby.getPlayers()) {
       player.getClient().sendDataToClient(msg);
     }

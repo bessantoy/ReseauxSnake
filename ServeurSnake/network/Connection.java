@@ -93,15 +93,15 @@ public class Connection extends Thread {
           break;
         case "RESUME":
           this.server.getController().play();
-          this.server.sendMessageToPlayers("RESUME");
+          this.server.sendDataToPlayers("RESUME");
 
           break;
         case "STEP":
           this.server.getController().step();
-          this.server.sendMessageToPlayers("STEP");
+          this.server.sendDataToPlayers("STEP");
           break;
         case "RESTART":
-          this.server.sendMessageToPlayers("RESTART");
+          this.server.sendDataToPlayers("RESTART");
           this.server.getController().restart();
           break;
         case "SPEED":
@@ -111,7 +111,7 @@ public class Connection extends Thread {
             Double speed = Double.parseDouble(response);
             if (this.server.getController().getSpeed() != speed) {
               this.server.getController().setSpeed(speed);
-              this.server.sendMessageToPlayers("SPEED#" + speed.toString());
+              this.server.sendDataToPlayers("SPEED#" + speed.toString());
             }
           } catch (IOException e) {
             e.printStackTrace();
@@ -183,7 +183,8 @@ public class Connection extends Thread {
     if (this.server.isGameInitialised()) {
       if (!this.server.getLobby().isEmpty()) {
         this.server.getController().initGame();
-        this.server.sendMessageToPlayers("LAUNCH");
+        this.server.getLobby().setGameLaunched(true);
+        this.server.sendDataToPlayers("LAUNCH");
       } else {
         this.sendInfoToClient("Not enough players");
       }
@@ -207,7 +208,14 @@ public class Connection extends Thread {
       if (this.server.getController().getNumberOfPlayers() < this.server.getLobby().getPlayers()
           .size()) {
         this.server.getLobby().getPlayers().clear();
-        this.server.sendDataToClients("Lobby reseted, please join again");
+        this.server.sendInfoToClients("Lobby reseted, please join again");
+      }
+      else {
+        if (this.server.getLobby().isGameLaunched()) {
+          this.server.getController().initGame();
+          this.server.sendDataToClients("INITIALISED#" + layout);
+          this.server.sendDataToClients("LAUNCH");
+        }
       }
     } else {
       this.sendDataToClient("Unknown layout : " + layout);

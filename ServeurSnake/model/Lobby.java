@@ -2,7 +2,6 @@ package model;
 
 import java.util.ArrayList;
 
-import network.Connection;
 import network.Human;
 import utils.HumanFeatures;
 import utils.LobbyFeatures;
@@ -10,10 +9,12 @@ import utils.LobbyFeatures;
 public class Lobby {
   private ArrayList<Human> players;
   private String map;
+  private boolean gameLaunched;
 
   public Lobby(ArrayList<Human> players, String map) {
     this.players = players;
     this.map = map;
+    this.gameLaunched = false;
   }
 
   public boolean isEmpty() {
@@ -54,6 +55,14 @@ public class Lobby {
 
   public void setMap(String map) {
     this.map = map;
+  }
+
+  public boolean isGameLaunched() {
+    return gameLaunched;
+  }
+
+  public void setGameLaunched(boolean gameLaunched) {
+    this.gameLaunched = gameLaunched;
   }
 
 }
