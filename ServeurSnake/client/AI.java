@@ -1,4 +1,4 @@
-package network;
+package client;
 
 public class AI extends Player {
   private String level;

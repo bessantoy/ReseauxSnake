@@ -1,27 +1,26 @@
-package model;
+package instance;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import network.Human;
+import client.Human;
 import utils.HumanFeatures;
 import utils.LobbyFeatures;
 
 public class Lobby {
   private ArrayList<Human> players;
   private String map;
-  private boolean gameLaunched;
 
-  public Lobby(ArrayList<Human> players, String map) {
-    this.players = players;
+  public Lobby(List<Human> players, String map) {
+    this.players = (ArrayList<Human>) players;
     this.map = map;
-    this.gameLaunched = false;
   }
 
   public boolean isEmpty() {
     return players.isEmpty();
   }
 
-  public ArrayList<Human> getPlayers() {
+  public List<Human> getPlayers() {
     return players;
   }
 
@@ -33,8 +32,13 @@ public class Lobby {
     players.add(player);
   }
 
-  public void clear() {
+  public void removeAllPlayers() {
     players.clear();
+  }
+
+  public void reset() {
+    removeAllPlayers();
+    setMap(null);
   }
 
   public LobbyFeatures toLobbyFeatures() {
@@ -49,20 +53,7 @@ public class Lobby {
     return this.map;
   }
 
-  public boolean isGameInitialised() {
-    return map != null;
-  }
-
   public void setMap(String map) {
     this.map = map;
   }
-
-  public boolean isGameLaunched() {
-    return gameLaunched;
-  }
-
-  public void setGameLaunched(boolean gameLaunched) {
-    this.gameLaunched = gameLaunched;
-  }
-
 }

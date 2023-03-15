@@ -1,4 +1,4 @@
-package network;
+package client;
 
 public abstract class Player {
   private String username;
@@ -15,5 +15,5 @@ public abstract class Player {
     this.username = username;
   }
 
-  abstract public boolean isHuman();
+  public abstract boolean isHuman();
 }

@@ -1,14 +1,14 @@
 package utils;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.List;
 
 public class LobbyFeatures {
   private ArrayList<HumanFeatures> players;
   private String map;
 
-  public LobbyFeatures(ArrayList<HumanFeatures> players, String map) {
-    this.players = players;
+  public LobbyFeatures(List<HumanFeatures> players, String map) {
+    this.players = (ArrayList<HumanFeatures>) players;
     this.map = map;
   }
 
@@ -16,12 +16,12 @@ public class LobbyFeatures {
     return players.isEmpty();
   }
 
-  public ArrayList<HumanFeatures> getPlayers() {
+  public List<HumanFeatures> getPlayers() {
     return players;
   }
 
-  public void setPlayers(ArrayList<HumanFeatures> players) {
-    this.players = players;
+  public void setPlayers(List<HumanFeatures> players) {
+    this.players = (ArrayList<HumanFeatures>) players;
   }
 
   public boolean isGameInitialised() {

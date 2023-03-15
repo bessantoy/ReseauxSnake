@@ -1,4 +1,4 @@
-package model;
+package network;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,6 +30,13 @@ public class Network extends Thread {
   private ViewClient viewClient;
   private ViewCommand viewCommand;
   private ViewSnakeGame viewSnakeGame;
+  private boolean gameOpen;
+
+  public Network() {
+    this.inputMoveHuman = null;
+    this.gameFeatures = null;
+    this.gameOpen = false;
+  }
 
   public void run() {
     try {
@@ -60,7 +67,6 @@ public class Network extends Thread {
     } catch (IOException e) {
       e.printStackTrace();
     }
-
   }
 
   public void play() {
@@ -71,12 +77,15 @@ public class Network extends Thread {
       this.interrupt();
     }
     this.askForViewUpdate();
-
   }
 
   private void askForViewUpdate() {
     System.out.println("Update view");
-    this.out.println("GAMEUPDATE");
+    sendViewCommandSignal("UPDATE");
+  }
+
+  private void askForLobbyUpdate() {
+    sendLobbySignal("UPDATE");
   }
 
   public void handleServerSignal(String signal) {
@@ -91,20 +100,19 @@ public class Network extends Thread {
     } else if (signal.equals("LAUNCH")) {
       askForViewUpdate();
     } else if (signal.startsWith("GAMEUPDATE#")) {
-      this.handleGameUpdate(signal);
+      if (this.gameOpen)
+        this.handleGameUpdate(signal);
+      else
+        this.handleLaunchGame(signal);
     } else if (signal.startsWith("LBYUPDATE#")) {
       this.handleLobbyUpdate(signal);
     } else if (signal.startsWith("SPEED#")) {
       this.handleSpeedChange(signal);
     } else if (signal.startsWith("INITIALISED#")) {
       this.handleGameInitalised(signal);
+    } else if (signal.startsWith("FINISHED")) {
+      this.handleGameFinished();
     }
-
-  }
-
-  public Network() {
-    this.inputMoveHuman = null;
-    this.gameFeatures = null;
   }
 
   public AgentAction getInputMoveHuman() {
@@ -132,25 +140,36 @@ public class Network extends Thread {
     this.id = Integer.parseInt(signal);
   }
 
+  public void handleLaunchGame(String signal) {
+    signal = signal.substring(11);
+    if (!signal.equals("-1")) {
+      this.readGameFeatures(signal);
+      this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
+          this.getGameFeatures().getSizeX(),
+          this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
+          this.getGameFeatures().getFeaturesSnakes(),
+          this.getGameFeatures().getFeaturesItems()), this);
+      this.viewCommand = new ViewCommand(this, this.viewSnakeGame.getjFrame());
+      play();
+      this.sendViewCommandSignal("JOINED");
+      this.gameOpen = true;
+    }
+  }
+
   public void handleGameUpdate(String signal) {
     signal = signal.substring(11);
     if (!signal.equals("-1")) {
       this.readGameFeatures(signal);
-      if (this.viewSnakeGame == null) {
-        this.viewSnakeGame = new ViewSnakeGame(new PanelSnakeGame(
-            this.getGameFeatures().getSizeX(),
-            this.getGameFeatures().getSizeY(), this.getGameFeatures().getWalls(),
-            this.getGameFeatures().getFeaturesSnakes(),
-            this.getGameFeatures().getFeaturesItems()), this);
-        this.viewCommand = new ViewCommand(this, this.viewSnakeGame.getjFrame());
-        play();
-      } else {
-        this.viewSnakeGame.update(this.gameFeatures);
-        this.viewCommand.update(this.gameFeatures);
-        if (this.gameFeatures.getState() == GameState.PLAYING)
-          this.play();
-      }
+      this.viewSnakeGame.update(this.gameFeatures);
+      this.viewCommand.update(this.gameFeatures);
+      if (this.gameFeatures.getState() == GameState.PLAYING)
+        this.play();
     }
+  }
+
+  public void handleLeaveGame() {
+    this.sendViewCommandSignal("EXIT");
+    this.gameOpen = false;
   }
 
   public void handleSpeedChange(String signal) {
@@ -180,10 +199,13 @@ public class Network extends Thread {
     this.viewClient.update(lobbyFeatures, id);
   }
 
+  public void handleGameFinished() {
+    askForLobbyUpdate();
+  }
+
   public void readGameFeatures(String json) {
     Gson gson = new Gson();
     this.gameFeatures = gson.fromJson(json, GameFeatures.class);
-
   }
 
   public void sendViewCommandSignal(String signal) {

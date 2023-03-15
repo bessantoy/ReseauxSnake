@@ -10,6 +10,8 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
 
+import network.Network;
+
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -18,7 +20,6 @@ import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
 
-import model.Network;
 import utils.HumanFeatures;
 import utils.LobbyFeatures;
 
@@ -149,18 +150,20 @@ public class ViewClient extends JFrame {
 
   private void handleButtonsUpdate(LobbyFeatures lobby, int id) {
     if (!lobby.isGameInitialised()) {
+      initGame.setEnabled(true);
+      initGame.setText("Init Game");
       launchGame.setEnabled(false);
       joinLobby.setEnabled(false);
-      initGame.setText("Init Game");
+      joinLobby.setText("Join Lobby");
     } else {
-      initGame.setText("Reset Game");
+      initGame.setEnabled(false);
       layout.setSelectedItem(lobby.getMap());
       joinLobby.setEnabled(true);
       if (lobby.isClientInLobby(id)) {
         removeActionListeners(joinLobby);
         joinLobby.addActionListener(e -> network.sendLobbySignal("LEAVE"));
         joinLobby.setText("Leave Lobby");
-        launchGame.setEnabled(true);
+        launchGame.setEnabled(lobby.isGameInitialised());
       } else {
         removeActionListeners(joinLobby);
         joinLobby.addActionListener(e -> network.sendLobbySignal("JOIN#" + name.getText()));

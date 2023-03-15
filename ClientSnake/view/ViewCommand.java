@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import model.Network;
+import network.Network;
 import utils.GameFeatures;
 
 import java.awt.*;

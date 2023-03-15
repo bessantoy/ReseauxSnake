@@ -1,7 +1,8 @@
-package network;
+package client;
 
 import java.net.Socket;
 
+import instance.Connection;
 import utils.AgentAction;
 import utils.HumanFeatures;
 

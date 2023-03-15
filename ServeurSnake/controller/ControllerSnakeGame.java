@@ -1,11 +1,10 @@
 package controller;
 
-import model.SnakeGame;
-
 import java.util.List;
 
+import client.Human;
 import model.InputMap;
-import network.Human;
+import model.SnakeGame;
 import utils.GameFeatures;
 
 public class ControllerSnakeGame extends AbstractController {
@@ -68,7 +67,7 @@ public class ControllerSnakeGame extends AbstractController {
 		}
 	}
 
-	public double getSpeed(){
+	public double getSpeed() {
 		return this.game.getTime();
 	}
 

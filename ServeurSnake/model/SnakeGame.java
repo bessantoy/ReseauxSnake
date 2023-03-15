@@ -6,11 +6,11 @@ import java.util.ListIterator;
 import java.util.Random;
 
 import agent.Snake;
+import client.AI;
+import client.Human;
 import factory.SnakeFactory;
 
 import item.Item;
-import network.Human;
-import network.AI;
 import utils.AgentAction;
 import utils.FeaturesItem;
 import utils.FeaturesSnake;

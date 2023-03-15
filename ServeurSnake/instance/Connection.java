@@ -1,4 +1,4 @@
-package network;
+package instance;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,7 +9,9 @@ import java.net.Socket;
 
 import com.google.gson.Gson;
 
+import client.Human;
 import controller.ControllerSnakeGame;
+import server.Server;
 import utils.AgentAction;
 import utils.GameFeatures;
 
@@ -17,6 +19,7 @@ public class Connection extends Thread {
   private Server server;
   private Socket client;
   private int id;
+  private Human player;
 
   private PrintWriter out;
   private BufferedReader in;
@@ -25,6 +28,7 @@ public class Connection extends Thread {
     this.client = socket;
     this.server = server;
     this.id = id;
+    this.player = null;
   }
 
   public void sendDataToClient(String msg) {
@@ -76,9 +80,6 @@ public class Connection extends Thread {
       handleViewCommandSignals(inputLine);
     } else if (inputLine.startsWith("MV#")) {
       handleMovementSignal(inputLine);
-    } else if (inputLine.equals("GAMEUPDATE")) {
-      System.out.println("Update view");
-      this.sendGameUpdate();
     }
     return true;
   }
@@ -94,7 +95,6 @@ public class Connection extends Thread {
         case "RESUME":
           this.server.getController().play();
           this.server.sendDataToPlayers("RESUME");
-
           break;
         case "STEP":
           this.server.getController().step();
@@ -105,16 +105,19 @@ public class Connection extends Thread {
           this.server.getController().restart();
           break;
         case "SPEED":
-          try {
-            String response = in.readLine();
-            response = response.substring(3);
-            Double speed = Double.parseDouble(response);
-            if (this.server.getController().getSpeed() != speed) {
-              this.server.getController().setSpeed(speed);
-              this.server.sendDataToPlayers("SPEED#" + speed.toString());
-            }
-          } catch (IOException e) {
-            e.printStackTrace();
+          handleSpeedChange();
+          break;
+        case "UPDATE":
+          this.sendGameUpdate();
+          break;
+        case "JOINED":
+          if (this.player != null) {
+            this.server.addPlayerInGame(this.player);
+          }
+          break;
+        case "EXIT":
+          if (this.player != null) {
+            this.server.removePlayerInGame(this.player);
           }
           break;
         default:
@@ -150,31 +153,24 @@ public class Connection extends Thread {
   private boolean handleLobbySignal(String signal) {
     signal = signal.substring(4);
     if (signal.equals("INIT")) {
-      initGame("arena");
+      initGame("INIT#arena");
     } else if (signal.startsWith("INIT#")) {
-      String layout = signal.substring(5);
-      initGame(layout);
+      initGame(signal);
     } else if (signal.startsWith("UPDATE")) {
-      this.sendLobbyInfoToClient();
+      sendLobbyInfoToClient();
     } else if (signal.startsWith("JOIN#")) {
       joinLobby(signal);
     } else if (signal.equals("LAUNCH")) {
-      this.handleLaunch();
-    } else if (signal.equals("ijl")) {
-      initGame("arena");
-      joinLobby("Anonym");
-      this.handleLaunch();
+      handleLaunch();
     } else if (signal.equals("LEAVE")) {
-      this.handleLeaveLobby();
-    } else if (signal.equals("reset lobby")) {
-      this.server.getLobby().clear();
+      handleLeaveLobby();
     } else if (signal.startsWith("level ")) {
       handleLevelChange(signal);
     } else if (signal.equals("EXIT")) {
-      this.handleClientExit();
+      handleClientExit();
       return false;
     } else {
-      this.sendInfoToClient("Unknown command : " + signal);
+      sendInfoToClient("Unknown command : " + signal);
     }
     return true;
   }
@@ -183,7 +179,7 @@ public class Connection extends Thread {
     if (this.server.isGameInitialised()) {
       if (!this.server.getLobby().isEmpty()) {
         this.server.getController().initGame();
-        this.server.getLobby().setGameLaunched(true);
+        this.server.launchGame();
         this.server.sendDataToPlayers("LAUNCH");
       } else {
         this.sendInfoToClient("Not enough players");
@@ -199,7 +195,22 @@ public class Connection extends Thread {
     this.server.sendInfoToClients("Client disconnected");
   }
 
-  private void initGame(String layout) {
+  private void handleSpeedChange() {
+    try {
+      String response = in.readLine();
+      response = response.substring(3);
+      Double speed = Double.parseDouble(response);
+      if (this.server.getController().getSpeed() != speed) {
+        this.server.getController().setSpeed(speed);
+        this.server.sendDataToPlayers("SPEED#" + speed.toString());
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void initGame(String signal) {
+    String layout = signal.substring(5);
     if (new File("./layouts/" + layout + ".lay").exists()) {
       this.server.setController(new ControllerSnakeGame(layout));
       this.server.loadGame();
@@ -209,9 +220,8 @@ public class Connection extends Thread {
           .size()) {
         this.server.getLobby().getPlayers().clear();
         this.server.sendInfoToClients("Lobby reseted, please join again");
-      }
-      else {
-        if (this.server.getLobby().isGameLaunched()) {
+      } else {
+        if (this.server.isGameLaunched()) {
           this.server.getController().initGame();
           this.server.sendDataToClients("INITIALISED#" + layout);
           this.server.sendDataToClients("LAUNCH");
@@ -227,7 +237,8 @@ public class Connection extends Thread {
     if (this.server.isGameInitialised()) {
       if (!this.server.isInLobby(this)) {
         if (this.server.getController().getNumberOfPlayers() >= this.server.getLobby().getPlayers().size()) {
-          this.server.getLobby().addPlayer(new Human(this, id, name));
+          this.player = new Human(this, id, name);
+          this.server.getLobby().addPlayer(this.player);
           System.out.println("Player " + name + " joined the lobby");
           this.sendInfoToClient("You joined the lobby");
           this.server.sendLobbyInfoToClients();

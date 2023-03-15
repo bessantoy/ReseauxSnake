@@ -1,11 +1,13 @@
-package network;
+package server;
 
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import client.Human;
 import controller.ControllerSnakeGame;
-import model.Lobby;
+import instance.Connection;
+import instance.Lobby;
 
 import java.io.*;
 
@@ -14,6 +16,8 @@ public class Server {
   private ArrayList<Connection> clients;
   private int idGenerator = 0;
   private Lobby lobby;
+  private boolean gameIsLaunched;
+  private ArrayList<Human> playersInGame;
   private ControllerSnakeGame controller;
   private String levelAI = "Advanced";
 
@@ -22,6 +26,8 @@ public class Server {
       serverSocket = new ServerSocket(port);
       System.out.println("Starting server");
       clients = new ArrayList<>();
+      playersInGame = new ArrayList<>();
+      gameIsLaunched = false;
       if (this.isGameInitialised()) {
         lobby = new Lobby(new ArrayList<>(), this.controller.getGame().getLayout());
       } else {
@@ -93,6 +99,14 @@ public class Server {
     this.lobby.setMap(this.controller.getInputMap().getFilename());
   }
 
+  public void launchGame() {
+    this.gameIsLaunched = true;
+  }
+
+  public boolean isGameLaunched() {
+    return gameIsLaunched;
+  }
+
   public ControllerSnakeGame getController() {
     return this.controller;
   }
@@ -120,6 +134,33 @@ public class Server {
       this.controller = null;
       this.lobby.setMap(null);
     }
+  }
+
+  public List<Human> getPlayersInGame() {
+    return playersInGame;
+  }
+
+  public void addPlayerInGame(Human player) {
+    playersInGame.add(player);
+  }
+
+  public void removePlayerInGame(Human player) {
+    playersInGame.remove(player);
+    if (this.playersInGame.isEmpty()) {
+      System.out.println("Every player left the game, the game terminated");
+      stopGame();
+    }
+  }
+
+  public void stopGame() {
+    this.controller = null;
+    gameIsLaunched = false;
+    this.lobby.reset();
+    sendLobbyInfoToClients();
+  }
+
+  public void updateLobby() {
+    this.lobby.setMap(this.controller != null ? this.controller.getInputMap().getFilename() : null);
   }
 
   public void setController(ControllerSnakeGame controller) {

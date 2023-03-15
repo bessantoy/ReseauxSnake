@@ -2,7 +2,7 @@ package view;
 
 import javax.swing.JFrame;
 
-import model.Network;
+import network.Network;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;

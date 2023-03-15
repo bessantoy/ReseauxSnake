@@ -1,11 +1,11 @@
 package factory;
 
 import agent.Snake;
+import client.Human;
 import strategy.StrategyHuman;
 import strategy.StrategyRandom;
 import strategy.StrategyAdvanced;
 import strategy.StrategyDown;
-import network.Human;
 import utils.FeaturesSnake;
 import utils.Position;
 
