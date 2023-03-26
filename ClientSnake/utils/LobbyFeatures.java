@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyFeatures {
+  private int id;
   private ArrayList<HumanFeatures> players;
   private ArrayList<Integer> lobbies;
   private GameInstanceFeatures gameInstanceFeatures;
 
-  public LobbyFeatures(List<HumanFeatures> players, List<Integer> lobbies, GameInstanceFeatures gameInstanceFeatures) {
+  public LobbyFeatures(int id, List<HumanFeatures> players, List<Integer> lobbies,
+      GameInstanceFeatures gameInstanceFeatures) {
+    this.id = id;
     this.players = (ArrayList<HumanFeatures>) players;
     this.lobbies = (ArrayList<Integer>) lobbies;
     this.gameInstanceFeatures = gameInstanceFeatures;
@@ -16,6 +19,10 @@ public class LobbyFeatures {
 
   public boolean isEmpty() {
     return players.isEmpty();
+  }
+
+  public int getId() {
+    return id;
   }
 
   public List<HumanFeatures> getPlayers() {
@@ -26,7 +33,7 @@ public class LobbyFeatures {
     return gameInstanceFeatures;
   }
 
-  public ArrayList<Integer> getLobbies() {
+  public List<Integer> getLobbies() {
     return lobbies;
   }
 
@@ -35,6 +42,8 @@ public class LobbyFeatures {
   }
 
   public boolean isGameInitialised() {
+    if (this.gameInstanceFeatures == null)
+      return false;
     return this.gameInstanceFeatures.getMap() != null;
   }
 

@@ -33,7 +33,7 @@ public class LobbyFeatures {
     return gameInstanceFeatures;
   }
 
-  public ArrayList<Integer> getLobbies() {
+  public List<Integer> getLobbies() {
     return lobbies;
   }
 

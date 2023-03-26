@@ -74,7 +74,7 @@ public class GameInstance {
   public void stopGame() {
     this.controller = null;
     gameIsLaunched = false;
-    this.lobby.reset();
+    this.init(map, levelAI);
     this.lobby.sendLobbyStatusToPlayers();
   }
 
