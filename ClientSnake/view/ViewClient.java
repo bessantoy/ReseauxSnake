@@ -3,21 +3,28 @@ package view;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextPane;
 import javax.swing.WindowConstants;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import network.Network;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.net.InetAddress;
 import java.awt.GridLayout;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 
 import utils.HumanFeatures;
@@ -25,19 +32,19 @@ import utils.LobbyFeatures;
 
 public class ViewClient extends JFrame {
   private Network network = null;
-  private JPanel panelTop;
+  private JScrollPane panelTop;
   private JPanel panelMiddle;
-  private JTextPane lobbyLabel;
-  private JPanel panelInit;
-  private JButton initGame;
-  private JPanel panelJoin;
-  private JButton joinLobby;
-  private JTextField name;
+  private JPanel lobbyInfo;
+  private JPanel panelReset;
+  private JPanel panelOptions;
+  private JButton resetGame;
+  private JButton createLobby;
   private JButton launchGame;
   private JButton exit;
   private JComboBox<String> layout;
+  private JComboBox<String> level;
 
-  public ViewClient(Network network, int id) {
+  public ViewClient(Network network, List<Integer> lobbies) {
     this.network = network;
     setTitle("Client Snake");
     setSize(500, 500);
@@ -50,48 +57,57 @@ public class ViewClient extends JFrame {
     addWindowListener(new WindowEventHandler(this));
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
-    panelTop = new JPanel();
+    panelTop = new JScrollPane();
+    panelTop.setPreferredSize(new Dimension(500, 300));
+    panelTop.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    panelTop.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-    lobbyLabel = new JTextPane();
-    lobbyLabel.setEditable(false);
-    lobbyLabel.setFont(new java.awt.Font("Arial", 1, 20));
-    lobbyLabel.setText("Lobby Info :\n    Lobby empty");
+    lobbyInfo = new JPanel();
+    lobbyInfo.setLayout(new BoxLayout(lobbyInfo, BoxLayout.Y_AXIS));
 
-    panelTop.setLayout(new BoxLayout(panelTop, BoxLayout.X_AXIS));
-    panelTop.add(lobbyLabel);
+    panelTop.setViewportView(lobbyInfo);
 
-    panelInit = new JPanel();
+    panelReset = new JPanel();
+    panelOptions = new JPanel();
 
-    initGame = new JButton();
-    initGame.setText("Init Game");
+    resetGame = new JButton();
+    resetGame.setText("Reset Game");
+    resetGame.addActionListener(
+        e -> network.sendLobbySignal("INIT#" + layout.getSelectedItem() + "#" + level.getSelectedItem()));
 
     String[] layouts = {
         "alone", "aloneNoWall", "arena", "arenaNoWall", "small", "smalArena", "smallArenaNoWall", "smallNoWall"
     };
     layout = new JComboBox<>(layouts);
-    layout.setFont(new java.awt.Font("Arial", 1, 20));
+    layout.setFont(new java.awt.Font("Arial", 1, 16));
     layout.setSelectedIndex(0);
 
-    initGame.addActionListener(e -> network.sendLobbySignal("INIT#" + layout.getSelectedItem()));
+    String[] levels = { "Advanced", "Random", "Down" };
+    level = new JComboBox<>(levels);
+    level.setFont(new java.awt.Font("Arial", 1, 16));
+    level.setSelectedIndex(0);
 
-    panelInit.setLayout(new GridLayout(1, 2));
-    panelInit.add(initGame);
-    panelInit.add(layout);
+    level.addItemListener(new ItemListener() {
+      public void itemStateChanged(ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+          network.sendLobbySignal("LEVEL#" + e.getItem());
+        }
+      }
+    });
 
-    panelJoin = new JPanel();
+    panelReset.setLayout(new GridLayout(1, 2));
+    panelReset.add(resetGame);
 
-    joinLobby = new JButton();
-    joinLobby.setText("Join Lobby");
+    panelOptions.setLayout(new GridLayout(1, 2));
+    panelOptions.add(layout);
+    panelOptions.add(level);
 
-    joinLobby.addActionListener(e -> network.sendLobbySignal("JOIN#" + name.getText()));
+    panelReset.add(panelOptions);
 
-    name = new JTextField();
-    name.setFont(new java.awt.Font("Arial", 1, 20));
-    name.setText("Anonym");
+    createLobby = new JButton();
+    createLobby.setText("Create Lobby");
 
-    panelJoin.setLayout(new GridLayout(1, 2));
-    panelJoin.add(joinLobby);
-    panelJoin.add(name);
+    createLobby.addActionListener(e -> network.sendLobbySignal("CREATE"));
 
     launchGame = new JButton();
     launchGame.setText("Launch Game");
@@ -105,8 +121,8 @@ public class ViewClient extends JFrame {
 
     panelMiddle = new JPanel();
     panelMiddle.setLayout(new GridLayout(4, 1));
-    panelMiddle.add(panelInit);
-    panelMiddle.add(panelJoin);
+    panelMiddle.add(createLobby);
+    panelMiddle.add(panelReset);
     panelMiddle.add(launchGame);
     panelMiddle.add(exit);
 
@@ -114,7 +130,7 @@ public class ViewClient extends JFrame {
     add("top", panelTop);
     add("middle", panelMiddle);
 
-    update(network.getLobbyFeatures(), id);
+    update(lobbies);
 
     setVisible(true);
 
@@ -127,50 +143,112 @@ public class ViewClient extends JFrame {
   }
 
   public void update(LobbyFeatures lobby, int id) {
+    System.out.println("update lobby");
     handleLobbyUpdate(lobby, id);
     handleButtonsUpdate(lobby, id);
   }
 
-  private void handleLobbyUpdate(LobbyFeatures lobby, int id) {
-    String lobbyString = "Lobby Info : ";
-    if (lobby.getPlayers().isEmpty()) {
-      lobbyString += "Lobby empty";
-    } else {
-      lobbyString += "\n";
-      for (HumanFeatures humanFeatures : lobby.getPlayers()) {
-        lobbyString += "    " + humanFeatures.getUsername();
-        if (humanFeatures.getId() == id) {
-          lobbyString += " (you)";
-        }
-        lobbyString += "\n";
-      }
+  public void update(List<Integer> lobbies) {
+    handleLobbiesUpdate((ArrayList<Integer>) lobbies);
+    handleButtonsUpdate();
+  }
+
+  private void handleLobbiesUpdate(ArrayList<Integer> lobbies) {
+    if (lobbies == null) {
+      return;
     }
-    lobbyLabel.setText(lobbyString);
+    lobbyInfo.removeAll();
+    for (int lobby : lobbies) {
+      JPanel containerPanel = new JPanel();
+      BoxLayout containerLayout = new BoxLayout(containerPanel, BoxLayout.X_AXIS);
+      containerPanel.setLayout(containerLayout);
+
+      containerPanel.setSize(new Dimension(500, 50));
+
+      JTextPane lobbyPanel = new JTextPane();
+      lobbyPanel.setEditable(false);
+      lobbyPanel.setText("Lobby " + lobby);
+      lobbyPanel.setFont(new java.awt.Font("Arial", 1, 16));
+      // align the text vertically in the middle
+      lobbyPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
+      lobbyPanel.setMaximumSize(new Dimension(380, 50));
+      lobbyPanel.setMinimumSize(new Dimension(380, 50));
+      lobbyPanel.setPreferredSize(new Dimension(380, 50));
+
+      containerPanel.add(lobbyPanel);
+
+      JButton joinButton = new JButton("Join");
+      joinButton.setMaximumSize(new Dimension(100, 50));
+      joinButton.setMinimumSize(new Dimension(100, 50));
+      joinButton.setPreferredSize(new Dimension(100, 50));
+      joinButton.addActionListener(e -> network.sendLobbySignal("JOIN#" + lobby));
+      containerPanel.add(joinButton);
+
+      lobbyInfo.add(containerPanel);
+    }
+    lobbyInfo.revalidate();
+    lobbyInfo.repaint();
+  }
+
+  private void handleLobbyUpdate(LobbyFeatures lobby, int id) {
+    lobbyInfo.removeAll();
+    if (lobby == null) {
+      return;
+    }
+    JTextPane lobbyPanel = new JTextPane();
+    lobbyPanel.setEditable(false);
+    String lobbyStringInfo = "Lobby " + lobby.getId() + " : " + lobby.getGameInstanceFeatures().getMap() + " "
+        + lobby.getGameInstanceFeatures().getLevelAI() + "\n";
+    for (HumanFeatures player : lobby.getPlayers()) {
+      lobbyStringInfo += "    " + player.getUsername();
+      if (player.getId() == id) {
+        lobbyStringInfo += " (You)";
+      }
+      lobbyStringInfo += "\n";
+    }
+    lobbyPanel.setText(lobbyStringInfo);
+    lobbyPanel.setFont(new java.awt.Font("Arial", 1, 16));
+
+    lobbyInfo.add(lobbyPanel);
+    lobbyInfo.revalidate();
+    lobbyInfo.repaint();
   }
 
   private void handleButtonsUpdate(LobbyFeatures lobby, int id) {
-    if (!lobby.isGameInitialised()) {
-      initGame.setEnabled(true);
-      initGame.setText("Init Game");
-      launchGame.setEnabled(false);
-      joinLobby.setEnabled(false);
-      joinLobby.setText("Join Lobby");
-    } else {
-      initGame.setEnabled(false);
-      layout.setSelectedItem(lobby.getMap());
-      joinLobby.setEnabled(true);
-      if (lobby.isClientInLobby(id)) {
-        removeActionListeners(joinLobby);
-        joinLobby.addActionListener(e -> network.sendLobbySignal("LEAVE"));
-        joinLobby.setText("Leave Lobby");
-        launchGame.setEnabled(lobby.isGameInitialised());
-      } else {
-        removeActionListeners(joinLobby);
-        joinLobby.addActionListener(e -> network.sendLobbySignal("JOIN#" + name.getText()));
-        joinLobby.setText("Join Lobby");
+    if (lobby.isClientInLobby(id)) {
+      removeActionListeners(createLobby);
+      createLobby.addActionListener(e -> network.sendLobbySignal("LEAVE"));
+      createLobby.setText("Leave Lobby");
+      layout.setEnabled(true);
+      level.setEnabled(true);
+      if (!lobby.isGameInitialised()) {
         launchGame.setEnabled(false);
+        resetGame.setEnabled(true);
+      } else {
+        launchGame.setEnabled(true);
+        resetGame.setEnabled(true);
+        layout.setSelectedItem(lobby.getGameInstanceFeatures().getMap());
+        level.setSelectedItem(lobby.getGameInstanceFeatures().getLevelAI());
       }
+    } else {
+      removeActionListeners(createLobby);
+      createLobby.addActionListener(e -> network.sendLobbySignal("CREATE"));
+      createLobby.setText("Create Lobby");
+      launchGame.setEnabled(false);
+      resetGame.setEnabled(false);
+      layout.setEnabled(false);
+      level.setEnabled(false);
     }
+  }
+
+  private void handleButtonsUpdate() {
+    removeActionListeners(createLobby);
+    createLobby.addActionListener(e -> network.sendLobbySignal("CREATE"));
+    createLobby.setText("Create Lobby");
+    launchGame.setEnabled(false);
+    resetGame.setEnabled(false);
+    layout.setEnabled(false);
+    level.setEnabled(false);
   }
 
   private void removeActionListeners(JButton button) {

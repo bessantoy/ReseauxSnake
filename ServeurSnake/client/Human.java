@@ -42,7 +42,7 @@ public class Human extends Player {
     this.lastInput = lastInput;
   }
 
-  public HumanFeatures toHumanFeatures() {
+  public HumanFeatures getHumanFeatures() {
     return new HumanFeatures(getUsername(), id);
   }
 

@@ -4,8 +4,8 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import client.Human;
-import controller.ControllerSnakeGame;
+import com.google.gson.Gson;
+
 import instance.Connection;
 import instance.Lobby;
 
@@ -14,27 +14,19 @@ import java.io.*;
 public class Server {
   private ServerSocket serverSocket;
   private ArrayList<Connection> clients;
-  private int idGenerator = 0;
-  private Lobby lobby;
-  private boolean gameIsLaunched;
-  private ArrayList<Human> playersInGame;
-  private ControllerSnakeGame controller;
-  private String levelAI = "Advanced";
+  private ArrayList<Lobby> lobbies;
+  private int idGeneratorClient = 0;
+  private int idGeneratorLobby = 0;
 
   public void start(int port) {
     try {
       serverSocket = new ServerSocket(port);
       System.out.println("Starting server");
       clients = new ArrayList<>();
-      playersInGame = new ArrayList<>();
-      gameIsLaunched = false;
-      if (this.isGameInitialised()) {
-        lobby = new Lobby(new ArrayList<>(), this.controller.getGame().getLayout());
-      } else {
-        lobby = new Lobby(new ArrayList<>(), null);
-      }
+      lobbies = new ArrayList<>();
+
       while (true) {
-        Connection connection = new Connection(serverSocket.accept(), this, idGenerator++);
+        Connection connection = new Connection(serverSocket.accept(), this, idGeneratorClient++);
         clients.add(connection);
         connection.start();
       }
@@ -57,122 +49,84 @@ public class Server {
     }
   }
 
-  public void sendDataToClients(String msg) {
+  public void sendCliDataToClients(String msg) {
     for (Connection connection : clients) {
-      connection.sendDataToClient(msg);
+      connection.sendCliDataToClient(msg);
     }
   }
 
-  public void sendInfoToPlayers(String msg) {
-    for (Human player : lobby.getPlayers()) {
-      player.getClient().sendInfoToClient(msg);
+  public void sendCliStatusToClient(Connection client) {
+    Gson gson = new Gson();
+    if (client.isInLobby()) {
+      getClientLobby(client).sendLobbyStatusToClient(client);
+    } else {
+      if (this.isLobbiesEmpty()) {
+        client.sendCliDataToClient("UPDATE#EMPTY");
+      } else {
+        client.sendCliDataToClient("UPDATE#" + gson.toJson(this.getLobbiesIds()));
+      }
     }
   }
 
-  public void sendDataToPlayers(String msg) {
-    for (Human player : lobby.getPlayers()) {
-      player.getClient().sendDataToClient(msg);
+  public void sendCliStatusToClients() {
+    for (Connection connection : clients) {
+      sendCliStatusToClient(connection);
     }
-  }
-
-  public boolean isInLobby(Connection client) {
-    for (int i = 0; i < this.lobby.getPlayers().size(); ++i) {
-      if (this.lobby.getPlayers().get(i).isClient(client))
-        return true;
-    }
-    return false;
-  }
-
-  public void sendLobbyInfoToClients() {
-    for (Connection client : clients) {
-      client.sendLobbyInfoToClient();
-    }
-  }
-
-  public boolean isGameInitialised() {
-    return this.controller != null;
-  }
-
-  public void loadGame() {
-    this.controller.setPlayers(lobby.getPlayers());
-    this.controller.setLevelAI(levelAI);
-    this.lobby.setMap(this.controller.getInputMap().getFilename());
-  }
-
-  public void launchGame() {
-    this.gameIsLaunched = true;
-  }
-
-  public boolean isGameLaunched() {
-    return gameIsLaunched;
-  }
-
-  public ControllerSnakeGame getController() {
-    return this.controller;
-  }
-
-  public Lobby getLobby() {
-    return this.lobby;
-  }
-
-  public Human getPlayer(Connection client) {
-    for (int i = 0; i < this.lobby.getPlayers().size(); ++i) {
-      if (this.lobby.getPlayers().get(i).isClient(client))
-        return this.lobby.getPlayers().get(i);
-    }
-    return null;
   }
 
   public List<Connection> getClients() {
     return this.clients;
   }
 
+  public Lobby getClientLobby(Connection client) {
+    for (Lobby lobby : lobbies) {
+      if (lobby.isInLobby(client))
+        return lobby;
+    }
+    return null;
+  }
+
   public void removeClient(Connection client) {
     clients.remove(client);
-    lobby.removePlayer(getPlayer(client));
-    if (clients.isEmpty()) {
-      this.controller = null;
-      this.lobby.setMap(null);
+    if (client.isInLobby()) {
+      Lobby lobby = getClientLobby(client);
+      if (lobby != null) {
+        lobby.removePlayer(client);
+      } else {
+        System.out.println("Error: client is in lobby but his lobby can't be found");
+      }
     }
   }
 
-  public List<Human> getPlayersInGame() {
-    return playersInGame;
-  }
-
-  public void addPlayerInGame(Human player) {
-    playersInGame.add(player);
-  }
-
-  public void removePlayerInGame(Human player) {
-    playersInGame.remove(player);
-    if (this.playersInGame.isEmpty()) {
-      System.out.println("Every player left the game, the game terminated");
-      stopGame();
+  public List<Integer> getLobbiesIds() {
+    List<Integer> ids = new ArrayList<>();
+    for (Lobby lobby : lobbies) {
+      ids.add(lobby.getLobbyId());
     }
+    return ids;
   }
 
-  public void stopGame() {
-    this.controller = null;
-    gameIsLaunched = false;
-    this.lobby.reset();
-    sendLobbyInfoToClients();
+  public Lobby getLobby(int id) {
+    for (Lobby lobby : lobbies) {
+      if (lobby.getLobbyId() == id)
+        return lobby;
+    }
+    return null;
   }
 
-  public void updateLobby() {
-    this.lobby.setMap(this.controller != null ? this.controller.getInputMap().getFilename() : null);
+  public boolean isLobbiesEmpty() {
+    return lobbies.isEmpty();
   }
 
-  public void setController(ControllerSnakeGame controller) {
-    this.controller = controller;
+  public void removeLobby(Lobby lobby) {
+    lobbies.remove(lobby);
   }
 
-  public String getLevelAI() {
-    return levelAI;
-  }
-
-  public void setLevelAI(String levelAI) {
-    this.levelAI = levelAI;
+  public int addLobby() {
+    Lobby lobby = new Lobby(this, idGeneratorLobby++);
+    lobby.start();
+    lobbies.add(lobby);
+    return lobby.getLobbyId();
   }
 
 }

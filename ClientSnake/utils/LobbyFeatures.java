@@ -5,11 +5,13 @@ import java.util.List;
 
 public class LobbyFeatures {
   private ArrayList<HumanFeatures> players;
-  private String map;
+  private ArrayList<Integer> lobbies;
+  private GameInstanceFeatures gameInstanceFeatures;
 
-  public LobbyFeatures(List<HumanFeatures> players, String map) {
+  public LobbyFeatures(List<HumanFeatures> players, List<Integer> lobbies, GameInstanceFeatures gameInstanceFeatures) {
     this.players = (ArrayList<HumanFeatures>) players;
-    this.map = map;
+    this.lobbies = (ArrayList<Integer>) lobbies;
+    this.gameInstanceFeatures = gameInstanceFeatures;
   }
 
   public boolean isEmpty() {
@@ -20,12 +22,20 @@ public class LobbyFeatures {
     return players;
   }
 
+  public GameInstanceFeatures getGameInstanceFeatures() {
+    return gameInstanceFeatures;
+  }
+
+  public ArrayList<Integer> getLobbies() {
+    return lobbies;
+  }
+
   public void setPlayers(List<HumanFeatures> players) {
     this.players = (ArrayList<HumanFeatures>) players;
   }
 
   public boolean isGameInitialised() {
-    return map != null;
+    return this.gameInstanceFeatures.getMap() != null;
   }
 
   public boolean isClientInLobby(int id) {
@@ -36,13 +46,4 @@ public class LobbyFeatures {
     }
     return false;
   }
-
-  public String getMap() {
-    return map;
-  }
-
-  public void setMap(String map) {
-    this.map = map;
-  }
-
 }

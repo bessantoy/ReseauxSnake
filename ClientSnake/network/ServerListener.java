@@ -16,11 +16,12 @@ public class ServerListener extends Thread {
   public void run() {
     String response;
     try {
-      while ((response = this.in.readLine()) != null) {
+      while ((response = this.in.readLine()) != null && !response.equals("EXIT")) {
         this.network.handleServerSignal(response);
       }
     } catch (IOException e) {
       e.printStackTrace();
     }
+
   }
 }

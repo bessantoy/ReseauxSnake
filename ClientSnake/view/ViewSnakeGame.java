@@ -3,11 +3,14 @@ package view;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import network.Network;
+import utils.FeaturesItem;
+import utils.FeaturesSnake;
 import utils.GameFeatures;
 
 public class ViewSnakeGame {
@@ -51,7 +54,8 @@ public class ViewSnakeGame {
 	}
 
 	public void update(GameFeatures game) {
-		panelSnake.updateInfoGame(game.getFeaturesSnakes(), game.getFeaturesItems());
+		panelSnake.updateInfoGame((ArrayList<FeaturesSnake>) game.getFeaturesSnakes(),
+				(ArrayList<FeaturesItem>) game.getFeaturesItems());
 		panelSnake.repaint();
 
 	}

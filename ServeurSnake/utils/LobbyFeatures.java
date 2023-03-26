@@ -4,20 +4,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyFeatures {
+  private int id;
   private ArrayList<HumanFeatures> players;
-  private String map;
+  private ArrayList<Integer> lobbies;
+  private GameInstanceFeatures gameInstanceFeatures;
 
-  public LobbyFeatures(List<HumanFeatures> players, String map) {
+  public LobbyFeatures(int id, List<HumanFeatures> players, List<Integer> lobbies,
+      GameInstanceFeatures gameInstanceFeatures) {
+    this.id = id;
     this.players = (ArrayList<HumanFeatures>) players;
-    this.map = map;
+    this.lobbies = (ArrayList<Integer>) lobbies;
+    this.gameInstanceFeatures = gameInstanceFeatures;
   }
 
   public boolean isEmpty() {
     return players.isEmpty();
   }
 
+  public int getId() {
+    return id;
+  }
+
   public List<HumanFeatures> getPlayers() {
     return players;
+  }
+
+  public GameInstanceFeatures getGameInstanceFeatures() {
+    return gameInstanceFeatures;
+  }
+
+  public ArrayList<Integer> getLobbies() {
+    return lobbies;
   }
 
   public void setPlayers(List<HumanFeatures> players) {
@@ -25,7 +42,9 @@ public class LobbyFeatures {
   }
 
   public boolean isGameInitialised() {
-    return map != null;
+    if (this.gameInstanceFeatures == null)
+      return false;
+    return this.gameInstanceFeatures.getMap() != null;
   }
 
   public boolean isClientInLobby(int id) {
@@ -36,13 +55,4 @@ public class LobbyFeatures {
     }
     return false;
   }
-
-  public String getMap() {
-    return map;
-  }
-
-  public void setMap(String map) {
-    this.map = map;
-  }
-
 }

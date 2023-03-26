@@ -1,7 +1,6 @@
 package factory;
 
 import agent.Snake;
-import client.Human;
 import strategy.StrategyHuman;
 import strategy.StrategyRandom;
 import strategy.StrategyAdvanced;

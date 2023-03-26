@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GameFeatures {
   private boolean[][] walls;
@@ -36,11 +37,11 @@ public class GameFeatures {
     return sizeY;
   }
 
-  public ArrayList<FeaturesSnake> getFeaturesSnakes() {
+  public List<FeaturesSnake> getFeaturesSnakes() {
     return featuresSnakes;
   }
 
-  public ArrayList<FeaturesItem> getFeaturesItems() {
+  public List<FeaturesItem> getFeaturesItems() {
     return featuresItems;
   }
 
@@ -54,38 +55,6 @@ public class GameFeatures {
 
   public long getSpeed() {
     return speed;
-  }
-
-  public void setWalls(boolean[][] walls) {
-    this.walls = walls;
-  }
-
-  public void setSizeX(int sizeX) {
-    this.sizeX = sizeX;
-  }
-
-  public void setSizeY(int sizeY) {
-    this.sizeY = sizeY;
-  }
-
-  public void setFeaturesSnakes(ArrayList<FeaturesSnake> featuresSnakes) {
-    this.featuresSnakes = featuresSnakes;
-  }
-
-  public void setFeaturesItems(ArrayList<FeaturesItem> featuresItems) {
-    this.featuresItems = featuresItems;
-  }
-
-  public void setState(GameState state) {
-    this.state = state;
-  }
-
-  public void setTurn(int turn) {
-    this.turn = turn;
-  }
-
-  public void setSpeed(long speed) {
-    this.speed = speed;
   }
 
 }

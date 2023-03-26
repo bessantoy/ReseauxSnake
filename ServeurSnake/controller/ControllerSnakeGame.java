@@ -15,7 +15,7 @@ public class ControllerSnakeGame extends AbstractController {
 
 	String levelAI;
 
-	public ControllerSnakeGame(String layoutName) {
+	public ControllerSnakeGame(String layoutName, String levelAI) {
 		try {
 			this.inputMap = new InputMap(layoutName);
 		} catch (Exception e) {
