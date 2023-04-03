@@ -186,7 +186,7 @@ public class Network extends Thread {
     if (!signal.equals("-1")) {
       this.readGameFeatures(signal);
       this.viewSnakeGame.update(this.gameFeatures);
-      this.viewCommand.update(this.gameFeatures);
+      this.viewCommand.update(this.gameFeatures, this.id);
       if (this.gameFeatures.getState() == GameState.PLAYING)
         this.play();
     }

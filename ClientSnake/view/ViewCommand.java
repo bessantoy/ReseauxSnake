@@ -14,7 +14,8 @@ import java.awt.event.ActionListener;
 public class ViewCommand {
 
 	private JPanel panelMain;
-	JLabel jtext;
+	JLabel textTurn;
+	JLabel textScore;
 
 	StateViewCommand state;
 
@@ -114,9 +115,16 @@ public class ViewCommand {
 
 		bas.add(j);
 
-		jtext = new JLabel("Tour : ", SwingConstants.CENTER);
+		textTurn = new JLabel("Tour : ", SwingConstants.CENTER);
+		textScore = new JLabel("Score : ", SwingConstants.CENTER);
 
-		bas.add(jtext);
+		JPanel infos = new JPanel();
+		infos.setLayout(new GridLayout(2, 1));
+
+		infos.add(textTurn);
+		infos.add(textScore);
+
+		bas.add(infos);
 		panelMain.add(bas);
 
 		mainFrame.add("South", panelMain);
@@ -131,9 +139,10 @@ public class ViewCommand {
 		this.state = state;
 	}
 
-	public void update(GameFeatures game) {
+	public void update(GameFeatures game, int id) {
 
-		jtext.setText("Tour :" + game.getTurn());
+		textTurn.setText("Tour :" + game.getTurn());
+		textScore.setText("Score :" + game.getPlayerScore(id));
 		switch (game.getState()) {
 			case PLAYING:
 				this.setState(new StateRunning(this));
@@ -147,7 +156,6 @@ public class ViewCommand {
 			case STARTING:
 				this.setState(new StateStarting(this));
 				break;
-
 		}
 	}
 

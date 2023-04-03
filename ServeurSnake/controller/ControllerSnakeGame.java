@@ -1,5 +1,6 @@
 package controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import client.Human;
@@ -15,7 +16,8 @@ public class ControllerSnakeGame extends AbstractController {
 
 	String levelAI;
 
-	public ControllerSnakeGame(String layoutName, String levelAI) {
+	public ControllerSnakeGame(String layoutName, List<Human> players, String levelAI) {
+		this.players = players;
 		try {
 			this.inputMap = new InputMap(layoutName);
 		} catch (Exception e) {

@@ -85,7 +85,7 @@ public class GameInstance {
   public void init(String layout, String levelAI) {
     this.map = layout;
     this.levelAI = levelAI;
-    this.controller = new ControllerSnakeGame(layout, levelAI);
+    this.controller = new ControllerSnakeGame(layout, playersInGame, levelAI);
     this.loadGame();
   }
 

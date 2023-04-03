@@ -14,11 +14,13 @@ import client.Human;
 import server.Server;
 import utils.AgentAction;
 import utils.GameFeatures;
+import utils.GameState;
 
 public class Connection extends Thread {
   private Server server;
   private Socket client;
   private Human player;
+  private API_Handler api;
   private Lobby lobby;
   private int id;
 
@@ -189,7 +191,7 @@ public class Connection extends Thread {
       String email = signalArray[1];
       String password = signalArray[2];
       System.out.println("Connection request : " + email);
-      API_Handler api = new API_Handler(email, password);
+      this.api = new API_Handler(email, password);
       if (api.getUsername() != null) {
         this.player = new Human(this, this.id, api.getUsername());
         this.sendCliDataToClient("CONNECTION#OK#" + this.id);
@@ -298,10 +300,9 @@ public class Connection extends Thread {
   private void handleCreateLobby() {
     System.out.println("Lobby created");
     int lobbyId = this.server.addLobby();
+    handleJoinLobby(Integer.toString(lobbyId));
     Lobby l = this.server.getLobby(lobbyId);
     l.getGameInstance().init("alone", "Advanced");
-    handleJoinLobby(Integer.toString(lobbyId));
-
     this.server.sendCliStatusToClients();
   }
 
@@ -314,7 +315,12 @@ public class Connection extends Thread {
   public void sendGameUpdate() {
     if (this.lobby != null && this.lobby.isGameInitialised()) {
       Gson gson = new Gson();
-      String update = gson.toJson(this.lobby.getGameInstance().getController().getGameFeatures(), GameFeatures.class);
+      GameFeatures gf = this.lobby.getGameInstance().getController().getGameFeatures();
+      if (gf.getState() == GameState.OVER) {
+        api.updateScore(gf.getPlayerScore(id));
+        System.out.println("Score updated");
+      }
+      String update = gson.toJson(gf, GameFeatures.class);
       sendGameDataToClient("UPDATE#" + update);
     } else {
       this.sendInfoToClient("No game started");

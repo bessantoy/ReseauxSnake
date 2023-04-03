@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import utils.AgentAction;
 import utils.ColorSnake;
@@ -70,8 +71,8 @@ public class InputMap implements Serializable {
 			buffer = new BufferedReader(lecture);
 			int y = 0;
 
-			start_snakes = new ArrayList<FeaturesSnake>();
-			start_items = new ArrayList<FeaturesItem>();
+			start_snakes = new ArrayList<>();
+			start_items = new ArrayList<>();
 
 			int id = 0;
 
@@ -88,11 +89,13 @@ public class InputMap implements Serializable {
 
 					if (ligne.charAt(x) == 'S') {
 
-						ArrayList<Position> pos = new ArrayList<Position>();
+						ArrayList<Position> pos = new ArrayList<>();
 						pos.add(new Position(x, y));
 
 						start_snakes
-								.add(new FeaturesSnake(pos, AgentAction.MOVE_DOWN, colorSnake[id % colorSnake.length], false, false));
+								.add(new FeaturesSnake(pos, AgentAction.MOVE_DOWN, colorSnake[id % colorSnake.length], false, false,
+										true,
+										0, 0));
 						id++;
 					}
 

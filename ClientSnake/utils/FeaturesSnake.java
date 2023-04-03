@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class FeaturesSnake {
 
@@ -13,95 +14,33 @@ public class FeaturesSnake {
 	boolean isInvincible;
 	boolean isSick;
 
-	public FeaturesSnake(ArrayList<Position> positions, AgentAction lastAction, ColorSnake colorSnake,
-			boolean isInvincible, boolean isSick) {
+	boolean isAlive;
 
-		this.positions = positions;
+	int id;
+	int score;
+
+	public FeaturesSnake(List<Position> positions, AgentAction lastAction, ColorSnake colorSnake,
+			boolean isInvincible, boolean isSick, boolean isAlive, int id, int score) {
+
+		this.positions = (ArrayList<Position>) positions;
 		this.colorSnake = colorSnake;
 		this.lastAction = lastAction;
 
 		this.isInvincible = isInvincible;
-
 		this.isSick = isSick;
 
+		this.isAlive = isAlive;
+
+		this.id = id;
+		this.score = score;
 	}
 
-	public FeaturesSnake(String json) {
-
-		positions = new ArrayList<Position>();
-
-		String[] jsonSplit = json.split(",");
-
-		for (int i = 0; i < jsonSplit.length; i++) {
-
-			if (jsonSplit[i].contains("positions")) {
-
-				String[] jsonSplit2 = jsonSplit[i].split(":");
-
-				String[] jsonSplit3 = jsonSplit2[1].split("}");
-
-				String[] jsonSplit4 = jsonSplit3[0].split("\\[");
-
-				String[] jsonSplit5 = jsonSplit4[1].split("\\}");
-
-				for (int j = 0; j < jsonSplit5.length; j++) {
-
-					String[] jsonSplit6 = jsonSplit5[j].split(",");
-
-					int x = Integer.parseInt(jsonSplit6[0].split(":")[1]);
-					int y = Integer.parseInt(jsonSplit6[1].split(":")[1]);
-
-					positions.add(new Position(x, y));
-
-				}
-
-			} else if (jsonSplit[i].contains("colorSnake")) {
-
-				String[] jsonSplit2 = jsonSplit[i].split(":");
-
-				String[] jsonSplit3 = jsonSplit2[1].split("}");
-
-				String[] jsonSplit4 = jsonSplit3[0].split("\"");
-
-				colorSnake = ColorSnake.valueOf(jsonSplit4[1]);
-
-			} else if (jsonSplit[i].contains("lastAction")) {
-
-				String[] jsonSplit2 = jsonSplit[i].split(":");
-
-				String[] jsonSplit3 = jsonSplit2[1].split("}");
-
-				String[] jsonSplit4 = jsonSplit3[0].split("\"");
-
-				lastAction = AgentAction.valueOf(jsonSplit4[1]);
-
-			} else if (jsonSplit[i].contains("isInvincible")) {
-
-				String[] jsonSplit2 = jsonSplit[i].split(":");
-
-				String[] jsonSplit3 = jsonSplit2[1].split("}");
-
-				isInvincible = Boolean.parseBoolean(jsonSplit3[0]);
-
-			} else if (jsonSplit[i].contains("isSick")) {
-
-				String[] jsonSplit2 = jsonSplit[i].split(":");
-
-				String[] jsonSplit3 = jsonSplit2[1].split("}");
-
-				isSick = Boolean.parseBoolean(jsonSplit3[0]);
-
-			}
-
-		}
-	}
-
-	public ArrayList<Position> getPositions() {
+	public List<Position> getPositions() {
 		return positions;
 	}
 
-	public void setPositions(ArrayList<Position> positions) {
-		this.positions = positions;
+	public void setPositions(List<Position> positions) {
+		this.positions = (ArrayList<Position>) positions;
 	}
 
 	public ColorSnake getColorSnake() {
@@ -128,12 +67,24 @@ public class FeaturesSnake {
 		this.isSick = isSick;
 	}
 
+	public boolean isAlive() {
+		return isAlive;
+	}
+
 	public AgentAction getLastAction() {
 		return lastAction;
 	}
 
 	public void setLastAction(AgentAction lastAction) {
 		this.lastAction = lastAction;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public int getScore() {
+		return score;
 	}
 
 }

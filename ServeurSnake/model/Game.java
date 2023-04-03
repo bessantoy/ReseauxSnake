@@ -30,13 +30,12 @@ public abstract class Game implements Runnable {
 
 	public void step() {
 
-		if (this.gameContinue() & turn < maxTurn) {
+		if (this.gameContinue() && turn < maxTurn) {
 			turn++;
 			System.out.println("Turn : " + turn);
 			try {
 				takeTurn();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} else {

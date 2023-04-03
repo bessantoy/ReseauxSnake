@@ -1,6 +1,7 @@
 package agent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import strategy.Strategy;
 import utils.AgentAction;
@@ -24,13 +25,15 @@ public class Snake {
 
 	private int id;
 
-	boolean toRemove;
+	private int score;
+
+	boolean isAlive;
 
 	ColorSnake colorSnake;
 
 	public Snake(Position position, AgentAction lastAction, int id, ColorSnake colorSnake) {
 
-		this.positions = new ArrayList<Position>();
+		this.positions = new ArrayList<>();
 
 		this.positions.add(position);
 
@@ -39,7 +42,7 @@ public class Snake {
 		this.setInvincibleTimer(-1);
 		this.setSickTimer(-1);
 
-		this.toRemove = false;
+		this.isAlive = true;
 
 		this.colorSnake = colorSnake;
 
@@ -48,19 +51,19 @@ public class Snake {
 	}
 
 	public FeaturesSnake toFeaturesSnake() {
-		return new FeaturesSnake(positions, lastAction, colorSnake, invincibleTimer > 0, sickTimer > 0);
+		return new FeaturesSnake(positions, lastAction, colorSnake, invincibleTimer > 0, sickTimer > 0, isAlive, id, score);
 	}
 
 	public int getSize() {
 		return this.positions.size();
 	}
 
-	public ArrayList<Position> getPositions() {
+	public List<Position> getPositions() {
 		return positions;
 	}
 
-	public void setPositions(ArrayList<Position> positions) {
-		this.positions = positions;
+	public void setPositions(List<Position> positions) {
+		this.positions = (ArrayList<Position>) positions;
 	}
 
 	public Strategy getStrategy() {
@@ -87,12 +90,12 @@ public class Snake {
 		this.id = id;
 	}
 
-	public boolean isToRemove() {
-		return toRemove;
+	public boolean isAlive() {
+		return isAlive;
 	}
 
-	public void setToRemove(boolean toRemove) {
-		this.toRemove = toRemove;
+	public void setAlive(boolean isAlive) {
+		this.isAlive = isAlive;
 	}
 
 	public void setOldTailX(int oldTailX) {
@@ -141,5 +144,13 @@ public class Snake {
 
 	public void setLastAction(AgentAction lastAction) {
 		this.lastAction = lastAction;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void increaseScore(int score) {
+		this.score += score;
 	}
 }

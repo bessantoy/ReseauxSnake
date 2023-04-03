@@ -90,7 +90,10 @@ public class PanelSnakeGame extends JPanel {
 		}
 
 		for (int i = 0; i < featuresSnakes.size(); i++) {
-			paint_Snake(g, featuresSnakes.get(i));
+			FeaturesSnake snake = featuresSnakes.get(i);
+			if (snake.isAlive()) {
+				paint_Snake(g, snake);
+			}
 		}
 
 		for (int i = 0; i < featuresItems.size(); i++) {
@@ -102,7 +105,7 @@ public class PanelSnakeGame extends JPanel {
 
 	void paint_Snake(Graphics g, FeaturesSnake featuresSnake) {
 
-		ArrayList<Position> positions = featuresSnake.getPositions();
+		ArrayList<Position> positions = (ArrayList<Position>) featuresSnake.getPositions();
 
 		AgentAction lastAction = featuresSnake.getLastAction();
 

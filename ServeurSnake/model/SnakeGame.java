@@ -94,12 +94,15 @@ public class SnakeGame extends Game {
 		while (iterSnakes.hasNext()) {
 
 			Snake snake = iterSnakes.next();
-			AgentAction agentAction = playSnake(snake);
+			if (snake.isAlive()) {
+				AgentAction agentAction = playSnake(snake);
 
-			if (isLegalMove(snake, agentAction)) {
-				moveSnake(agentAction, snake);
-			} else {
-				moveSnake(snake.getLastAction(), snake);
+				if (isLegalMove(snake, agentAction)) {
+					moveSnake(agentAction, snake);
+				} else {
+					moveSnake(snake.getLastAction(), snake);
+				}
+				snake.increaseScore(10);
 			}
 		}
 
@@ -117,9 +120,8 @@ public class SnakeGame extends Game {
 				addRandomItem();
 			}
 		}
-		removeSnake();
-
 		updateSnakeTimers();
+
 	}
 
 	public boolean isLegalMove(Snake snake, AgentAction action) {
@@ -133,7 +135,14 @@ public class SnakeGame extends Game {
 
 	@Override
 	public boolean gameContinue() {
-		return !snakes.isEmpty();
+		ListIterator<Snake> iterSnakes = snakes.listIterator();
+		while (iterSnakes.hasNext()) {
+			Snake snake = iterSnakes.next();
+			if (snake.isAlive()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -229,6 +238,7 @@ public class SnakeGame extends Game {
 
 						if (item.getItemType() == ItemType.APPLE) {
 							increaseSizeSnake(snake);
+							snake.increaseScore(100);
 							isAppleEaten = true;
 						}
 
@@ -267,12 +277,12 @@ public class SnakeGame extends Game {
 					if ((snake1.getId() != snake2.getId())
 							&& (x2 == snake1.getPositions().get(0).getX() && y2 == snake1.getPositions().get(0).getY())
 							&& (snake1.getSize() <= snake2.getSize())) {
-						snake1.setToRemove(true);
+						snake1.setAlive(false);
 					}
 
 					for (int i = 1; i < snake1.getPositions().size(); i++) {
 						if (x2 == snake1.getPositions().get(i).getX() && y2 == snake1.getPositions().get(i).getY()) {
-							snake1.setToRemove(true);
+							snake1.setAlive(false);
 						}
 					}
 				}
@@ -288,19 +298,8 @@ public class SnakeGame extends Game {
 				int y = snake1.getPositions().get(0).getY() % this.sizeY;
 
 				if (walls[x][y]) {
-					snake1.setToRemove(true);
+					snake1.setAlive(false);
 				}
-			}
-		}
-	}
-
-	public void removeSnake() {
-		ListIterator<Snake> iterSnake = snakes.listIterator();
-
-		while (iterSnake.hasNext()) {
-			Snake snake = iterSnake.next();
-			if (snake.isToRemove()) {
-				iterSnake.remove();
 			}
 		}
 	}
