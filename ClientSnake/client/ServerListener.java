@@ -1,4 +1,4 @@
-package network;
+package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -6,9 +6,9 @@ import java.io.IOException;
 public class ServerListener extends Thread {
 
   private BufferedReader in;
-  private Network network;
+  private Client network;
 
-  public ServerListener(Network network, BufferedReader in) {
+  public ServerListener(Client network, BufferedReader in) {
     this.in = in;
     this.network = network;
   }

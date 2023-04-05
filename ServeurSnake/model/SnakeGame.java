@@ -38,7 +38,6 @@ public class SnakeGame extends Game {
 	private String layout;
 
 	List<Human> players;
-	List<AI> aiList;
 
 	private String levelAI;
 
@@ -50,8 +49,6 @@ public class SnakeGame extends Game {
 		this.inputMap = inputMap;
 		this.players = players;
 		this.levelAI = levelAI;
-		this.aiList = new ArrayList<>();
-
 	}
 
 	@Override
@@ -69,15 +66,21 @@ public class SnakeGame extends Game {
 		snakes = new ArrayList<>();
 		items = new ArrayList<>();
 
-		int iaCount = 0;
+		int id = 0;
 
+		ArrayList<Integer> usedIds = new ArrayList<>();
 		for (int i = 0; i < startSnakes.size(); ++i) {
 			FeaturesSnake featuresSnake = startSnakes.get(i);
 			if (i < players.size()) {
-				snakes.add(snakeFactory.createSnake(featuresSnake, i));
+				int playerId = players.get(i).getClient().getClientId();
+				snakes.add(snakeFactory.createSnake(featuresSnake, playerId));
+				usedIds.add(playerId);
 			} else {
-				aiList.add(new AI("IA" + iaCount++, levelAI));
-				snakes.add(snakeFactory.createSnake(featuresSnake, i, levelAI));
+				while (usedIds.contains(id)) {
+					id++;
+				}
+				snakes.add(snakeFactory.createSnake(featuresSnake, id, levelAI));
+				usedIds.add(id);
 			}
 		}
 

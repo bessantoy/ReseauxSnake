@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import network.Network;
+import client.Client;
 import utils.GameFeatures;
 
 import java.awt.*;
@@ -19,7 +19,7 @@ public class ViewCommand {
 
 	StateViewCommand state;
 
-	Network network;
+	Client network;
 
 	JButton initChoice;
 	JButton pauseChoice;
@@ -30,7 +30,7 @@ public class ViewCommand {
 
 	private boolean userChangeValue = true;
 
-	public ViewCommand(Network network, JFrame mainFrame) {
+	public ViewCommand(Client network, JFrame mainFrame) {
 
 		this.network = network;
 
@@ -116,7 +116,7 @@ public class ViewCommand {
 		bas.add(j);
 
 		textTurn = new JLabel("Tour : ", SwingConstants.CENTER);
-		textScore = new JLabel("Score : ", SwingConstants.CENTER);
+		textScore = new JLabel("", SwingConstants.CENTER);
 
 		JPanel infos = new JPanel();
 		infos.setLayout(new GridLayout(2, 1));
@@ -142,7 +142,11 @@ public class ViewCommand {
 	public void update(GameFeatures game, int id) {
 
 		textTurn.setText("Tour :" + game.getTurn());
-		textScore.setText("Score :" + game.getPlayerScore(id));
+		if (game.getPlayerScore(id) != -1)
+			textScore.setText("Score :" + game.getPlayerScore(id));
+		else {
+			textScore.setText("Spectator");
+		}
 		switch (game.getState()) {
 			case PLAYING:
 				this.setState(new StateRunning(this));

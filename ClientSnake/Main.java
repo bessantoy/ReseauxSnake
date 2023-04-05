@@ -1,8 +1,8 @@
-import network.Network;
+import client.Client;
 
 public class Main {
     public static void main(String[] args) {
-        Network network = new Network();
+        Client network = new Client();
         network.start();
     }
 }

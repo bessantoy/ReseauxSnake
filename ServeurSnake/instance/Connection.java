@@ -193,7 +193,7 @@ public class Connection extends Thread {
       System.out.println("Connection request : " + email);
       this.api = new API_Handler(email, password);
       if (api.getUsername() != null) {
-        this.player = new Human(this, this.id, api.getUsername());
+        this.player = new Human(this, api.getUsername());
         this.sendCliDataToClient("CONNECTION#OK#" + this.id);
         this.server.sendCliStatusToClient(this);
       } else {
@@ -244,16 +244,10 @@ public class Connection extends Thread {
         this.lobby.sendInfoToPlayers("Game initialised (" + layout + " | " + this.lobby.getGameInstance()
             .getLevelAI() + ")");
         this.lobby.sendGameDataToPlayers("INITIALISED#" + layout);
-        if (this.lobby.getGameInstance().getController().getNumberOfPlayers() < this.lobby.getPlayers()
-            .size()) {
-          this.lobby.getPlayers().clear();
-          this.lobby.sendInfoToPlayers("Lobby reseted, please join again");
-        } else {
-          if (this.lobby.getGameInstance().isGameLaunched()) {
-            this.lobby.getGameInstance().getController().initGame();
-            this.lobby.sendGameDataToPlayers("INITIALISED#" + layout);
-            this.lobby.sendGameDataToPlayers("LAUNCH");
-          }
+        if (this.lobby.getGameInstance().isGameLaunched()) {
+          this.lobby.getGameInstance().getController().initGame();
+          this.lobby.sendGameDataToPlayers("INITIALISED#" + layout);
+          this.lobby.sendGameDataToPlayers("LAUNCH");
         }
       } else {
         this.sendInfoToClient("Unknown layout : " + layout);
@@ -300,9 +294,9 @@ public class Connection extends Thread {
   private void handleCreateLobby() {
     System.out.println("Lobby created");
     int lobbyId = this.server.addLobby();
-    handleJoinLobby(Integer.toString(lobbyId));
     Lobby l = this.server.getLobby(lobbyId);
     l.getGameInstance().init("alone", "Advanced");
+    handleJoinLobby(Integer.toString(lobbyId));
     this.server.sendCliStatusToClients();
   }
 
@@ -318,7 +312,6 @@ public class Connection extends Thread {
       GameFeatures gf = this.lobby.getGameInstance().getController().getGameFeatures();
       if (gf.getState() == GameState.OVER) {
         api.updateScore(gf.getPlayerScore(id));
-        System.out.println("Score updated");
       }
       String update = gson.toJson(gf, GameFeatures.class);
       sendGameDataToClient("UPDATE#" + update);

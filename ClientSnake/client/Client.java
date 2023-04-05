@@ -1,4 +1,4 @@
-package network;
+package client;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,7 +22,7 @@ import view.ViewClient;
 import view.ViewCommand;
 import view.ViewSnakeGame;
 
-public class Network extends Thread {
+public class Client extends Thread {
 
   private AgentAction inputMoveHuman;
   private GameFeatures gameFeatures;
@@ -35,7 +35,7 @@ public class Network extends Thread {
   private ViewSnakeGame viewSnakeGame;
   private boolean gameOpen;
 
-  public Network() {
+  public Client() {
     this.inputMoveHuman = null;
     this.gameFeatures = null;
     this.gameOpen = false;
@@ -283,4 +283,5 @@ public class Network extends Thread {
     Gson gson = new Gson();
     this.gameFeatures = gson.fromJson(json, GameFeatures.class);
   }
+
 }

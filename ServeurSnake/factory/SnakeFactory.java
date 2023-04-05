@@ -1,5 +1,7 @@
 package factory;
 
+import java.util.List;
+
 import agent.Snake;
 import strategy.StrategyHuman;
 import strategy.StrategyRandom;

@@ -13,7 +13,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import network.Network;
+import client.Client;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -31,7 +31,7 @@ import utils.HumanFeatures;
 import utils.LobbyFeatures;
 
 public class ViewClient extends JFrame {
-  private Network network = null;
+  private Client network = null;
   private JScrollPane panelTop;
   private JPanel panelMiddle;
   private JPanel lobbyInfo;
@@ -44,7 +44,7 @@ public class ViewClient extends JFrame {
   private JComboBox<String> layout;
   private JComboBox<String> level;
 
-  public ViewClient(Network network, List<Integer> lobbies) {
+  public ViewClient(Client network, List<Integer> lobbies) {
     this.network = network;
     setTitle("Client Snake");
     setSize(500, 500);
@@ -76,7 +76,7 @@ public class ViewClient extends JFrame {
         e -> network.sendLobbySignal("INIT#" + layout.getSelectedItem() + "#" + level.getSelectedItem()));
 
     String[] layouts = {
-        "alone", "aloneNoWall", "arena", "arenaNoWall", "small", "smalArena", "smallArenaNoWall", "smallNoWall"
+        "alone", "aloneNoWall", "arena", "arenaNoWall", "small", "smallArena", "smallArenaNoWall", "smallNoWall"
     };
     layout = new JComboBox<>(layouts);
     layout.setFont(new java.awt.Font("Arial", 1, 16));
@@ -199,12 +199,17 @@ public class ViewClient extends JFrame {
     lobbyPanel.setEditable(false);
     String lobbyStringInfo = "Lobby " + lobby.getId() + " : " + lobby.getGameInstanceFeatures().getMap() + " "
         + lobby.getGameInstanceFeatures().getLevelAI() + "\n";
+    int nbPlayers = 1;
     for (HumanFeatures player : lobby.getPlayers()) {
       lobbyStringInfo += "    " + player.getUsername();
       if (player.getId() == id) {
         lobbyStringInfo += " (You)";
       }
+      if (nbPlayers > lobby.getGameInstanceFeatures().getPlayerCapacity()) {
+        lobbyStringInfo += " (Spectator)";
+      }
       lobbyStringInfo += "\n";
+      nbPlayers++;
     }
     lobbyPanel.setText(lobbyStringInfo);
     lobbyPanel.setFont(new java.awt.Font("Arial", 1, 16));

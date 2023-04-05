@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import network.Network;
+import client.Client;
 import utils.FeaturesItem;
 import utils.FeaturesSnake;
 import utils.GameFeatures;
@@ -18,7 +18,7 @@ public class ViewSnakeGame {
 	private JFrame jFrame;
 	private PanelSnakeGame panelSnake;
 
-	public ViewSnakeGame(PanelSnakeGame panelSnake, Network network) {
+	public ViewSnakeGame(PanelSnakeGame panelSnake, Client network) {
 
 		jFrame = new MainFrame(network);
 		jFrame.setTitle("Game");

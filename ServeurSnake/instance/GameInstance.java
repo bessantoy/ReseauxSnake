@@ -117,6 +117,10 @@ public class GameInstance {
     this.map = map;
   }
 
+  public int getPlayerCapacity() {
+    return this.controller.getInputMap().getStart_snakes().size();
+  }
+
   public List<HumanFeatures> getPlayersFeatures() {
     List<HumanFeatures> playersFeatures = new ArrayList<>();
     for (Human player : lobby.getPlayers()) {
@@ -126,7 +130,8 @@ public class GameInstance {
   }
 
   public GameInstanceFeatures getGameInstanceFeatures() {
-    return new GameInstanceFeatures(this.getPlayersFeatures(), this.getMap(), this.getLevelAI());
+    return new GameInstanceFeatures(this.getPlayersFeatures(), this.getMap(), this.getPlayerCapacity(),
+        this.getLevelAI());
   }
 
 }

@@ -2,15 +2,15 @@ package view;
 
 import javax.swing.JFrame;
 
-import network.Network;
+import client.Client;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class MainFrame extends JFrame implements KeyListener {
-    Network network = null;
+    Client network = null;
 
-    public MainFrame(Network network) {
+    public MainFrame(Client network) {
         this.network = network;
         addKeyListener(this);
         setFocusable(true);

@@ -8,13 +8,11 @@ import utils.HumanFeatures;
 
 public class Human extends Player {
   private Connection client;
-  private int id;
   AgentAction lastInput;
 
-  public Human(Connection client, int id, String username) {
+  public Human(Connection client, String username) {
     super(username);
     this.client = client;
-    this.id = id;
     this.lastInput = AgentAction.MOVE_DOWN;
   }
 
@@ -43,7 +41,7 @@ public class Human extends Player {
   }
 
   public HumanFeatures getHumanFeatures() {
-    return new HumanFeatures(getUsername(), id);
+    return new HumanFeatures(getUsername(), this.getClient().getClientId());
   }
 
   @Override

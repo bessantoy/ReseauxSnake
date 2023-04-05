@@ -133,6 +133,8 @@ public class API_Handler {
             int responseCode = con.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
                 System.out.println("Failed to update score");
+            } else {
+                System.out.println("Score updated");
             }
         } catch (Exception e) {
             System.out.println("Failed to update score");
