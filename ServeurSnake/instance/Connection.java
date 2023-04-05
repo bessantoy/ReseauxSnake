@@ -60,7 +60,7 @@ public class Connection extends Thread {
 
   private boolean handleCommand(String inputLine) {
     if (inputLine.startsWith("CLI#")) {
-      handleCliSignal(inputLine);
+      return handleCliSignal(inputLine);
     } else if (inputLine.startsWith("LBY#")) {
       handleLobbySignal(inputLine);
     } else if (inputLine.startsWith("VC#")) {
