@@ -9,7 +9,7 @@ public class StrategyHuman implements Strategy {
     @Override
     public AgentAction chooseAction(Snake snake, SnakeGame snakeGame) {
 
-        return snakeGame.getPlayers().get(snake.getId()).getLastInput();
+        return snakeGame.getPlayer(snake.getId()).getLastInput();
 
     }
 

@@ -10,7 +10,17 @@ else
     cd "$1"
     file=$(find . -maxdepth 1 -iname "main.java" -type f)
     if [ -f "$file" ]; then
-      java --enable-preview --source 19 -cp "$path/build/:$path/lib/gson.jar:$path/lib/java-json.jar" $file
+      cp=""
+      if [ -d "$path/lib" ]; then
+        cp="$path/lib/*:"
+      fi
+      if [ ! -d "$path/build" ]; then
+        mkdir "$path/build"
+      fi
+      for i in $(find . -maxdepth 1 -iname "*.java" -type f); do
+        javac -d $path/build/ -cp "$cp" $i
+      done
+      java -cp "$path/build/:$cp" $file
       cd ../
     else
       echo "$1/Main.java does not exist"

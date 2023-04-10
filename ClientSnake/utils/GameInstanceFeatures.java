@@ -7,10 +7,12 @@ public class GameInstanceFeatures {
   private ArrayList<HumanFeatures> players;
   private String map;
   private String levelAI;
+  private int playerCapacity;
 
-  public GameInstanceFeatures(List<HumanFeatures> players, String map, String levelAI) {
+  public GameInstanceFeatures(List<HumanFeatures> players, String map, int capacity, String levelAI) {
     this.players = (ArrayList<HumanFeatures>) players;
     this.map = map;
+    this.playerCapacity = capacity;
     this.levelAI = levelAI;
   }
 
@@ -28,6 +30,10 @@ public class GameInstanceFeatures {
 
   public String getMap() {
     return map;
+  }
+
+  public int getPlayerCapacity() {
+    return playerCapacity;
   }
 
   public String getLevelAI() {

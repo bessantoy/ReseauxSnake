@@ -1,14 +1,12 @@
 package utils;
 
-import java.net.InetAddress;
-
 public class HumanFeatures {
   private String username;
-  private InetAddress clientAdress;
+  private int id;
 
-  public HumanFeatures(String username, InetAddress clientAdress) {
+  public HumanFeatures(String username, int id) {
     this.username = username;
-    this.clientAdress = clientAdress;
+    this.id = id;
   }
 
   public String getUsername() {
@@ -19,12 +17,8 @@ public class HumanFeatures {
     this.username = username;
   }
 
-  public InetAddress getClientAdress() {
-    return clientAdress;
-  }
-
-  public void setClientAdress(InetAddress clientAdress) {
-    this.clientAdress = clientAdress;
+  public int getId() {
+    return id;
   }
 
 }

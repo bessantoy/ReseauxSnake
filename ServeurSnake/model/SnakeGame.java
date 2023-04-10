@@ -399,6 +399,15 @@ public class SnakeGame extends Game {
 		return players;
 	}
 
+	public Human getPlayer(int id) {
+		for (Human player : players) {
+			if (player.getClient().getClientId() == id) {
+				return player;
+			}
+		}
+		return null;
+	}
+
 	public void setPlayers(List<Human> players) {
 		this.players = players;
 	}

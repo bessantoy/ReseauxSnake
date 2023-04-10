@@ -1,7 +1,5 @@
 package utils;
 
-import java.net.InetAddress;
-
 public class HumanFeatures {
   private String username;
   private int id;
