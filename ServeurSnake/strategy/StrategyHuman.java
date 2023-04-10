@@ -12,5 +12,4 @@ public class StrategyHuman implements Strategy {
         return snakeGame.getPlayer(snake.getId()).getLastInput();
 
     }
-
 }

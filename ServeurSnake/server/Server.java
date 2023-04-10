@@ -21,7 +21,7 @@ public class Server {
   public void start(int port) {
     try {
       serverSocket = new ServerSocket(port);
-      System.out.println("Starting server");
+      System.out.println("Server is running");
       clients = new ArrayList<>();
       lobbies = new ArrayList<>();
 
